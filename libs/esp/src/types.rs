@@ -107,7 +107,7 @@ pub use string::*;
 pub use weapon::*;
 
 #[rustfmt::skip]
-#[esp_meta]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(TES3Object, Clone, Debug, From, PartialEq)]
 pub enum TES3Object {
     #[tag("TES3")] Header(Header),

@@ -20,6 +20,8 @@ rayon = "^1.7"
 smart-default = "^0.7"
 # serde-related features
 base64-simd = { version = "^0.8", optional = true }
+ecolor = { version = "^0.21", optional = true }                      # egui related features
+egui = { version = "^0.21", optional = true }
 serde = { version = "^1.0", features = ["derive"], optional = true }
 zstd = { version = "^0.12", optional = true }
 
@@ -32,10 +34,11 @@ default = []
 nightly = ["bytes_io/nightly", "hashbrown/nightly"]
 simd = ["bytes_io/simd"]
 serde = [
-    "dep:serde",
-    "dep:base64-simd",
-    "bitflags/serde",
-    "bstr/serde",
-    "esp_macros/serde",
-    "hashbrown/serde",
+  "dep:serde",
+  "dep:base64-simd",
+  "bitflags/serde",
+  "bstr/serde",
+  "esp_macros/serde",
+  "hashbrown/serde",
 ]
+egui = ["dep:egui", "dep:ecolor"]

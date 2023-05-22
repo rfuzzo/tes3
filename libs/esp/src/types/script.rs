@@ -1,7 +1,7 @@
 // internal imports
 use crate::prelude::*;
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct Script {
     pub flags: ObjectFlags,
@@ -89,5 +89,39 @@ impl Save for Script {
             stream.save(&0u32)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(feature = "egui")]
+impl crate::editor::Editor for Script {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+        egui::Grid::new("Editor").num_columns(2).striped(true).show(ui, |ui| {
+            ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));
+            self.flags.add_editor(ui, Some("flags".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("id").color(egui::Color32::LIGHT_BLUE));
+            self.id.add_editor(ui, Some("id".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("header").color(egui::Color32::LIGHT_BLUE));
+            self.header.add_editor(ui, Some("header".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("variables").color(egui::Color32::LIGHT_BLUE));
+            self.variables.add_editor(ui, Some("variables".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("bytecode").color(egui::Color32::LIGHT_BLUE));
+            self.bytecode.add_editor(ui, Some("bytecode".to_owned()));
+            ui.end_row();
+
+            // custom editor here
+            ui.label(egui::RichText::new("script_text").color(egui::Color32::LIGHT_BLUE));
+            egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
+                ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.script_text));
+            });
+            ui.end_row();
+        });
     }
 }

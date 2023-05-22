@@ -7,7 +7,7 @@ use bytemuck::TransparentWrapper;
 // internal imports
 use crate::prelude::*;
 
-#[esp_meta]
+#[esp_meta(true)]
 #[repr(transparent)]
 #[derive(TransparentWrapper)]
 #[derive(Clone, Debug, Default, Deref, DerefMut, Eq, From, Into, PartialEq)]

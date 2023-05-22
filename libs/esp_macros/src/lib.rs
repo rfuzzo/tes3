@@ -5,9 +5,14 @@ mod features;
 
 #[doc(hidden)]
 #[proc_macro_attribute]
-pub fn esp_meta(_args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn esp_meta(args: TokenStream, input: TokenStream) -> TokenStream {
     #[allow(unused_mut)]
     let mut input = syn::parse_macro_input!(input as syn::DeriveInput);
+
+    // todo parse this properly
+    if args.to_string().is_empty() {
+        impl_meta(&mut input);
+    }
 
     #[cfg(feature = "serde")]
     {
@@ -103,6 +108,8 @@ fn tes3object_variant_impls(idents: &[syn::Ident], tags: &[syn::LitStr]) -> impl
 fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
     quote! {
         use bytes_io::*;
+        #[cfg(feature = "egui")]
+        use crate::editor::Editor;
 
         impl Load for TES3Object {
             fn load(stream: &mut Reader<'_>) -> io::Result<Self> {
@@ -145,6 +152,17 @@ fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
                 Ok(())
             }
         }
+
+        #[cfg(feature = "egui")]
+        impl Editor for TES3Object {
+            fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+                match self {
+                    #(
+                        TES3Object::#idents(obj) => obj.add_editor(ui, None),
+                    )*
+                }
+            }
+        }
     }
 }
 
@@ -182,4 +200,10 @@ where
     I: IntoIterator<Item = &'a syn::Variant>,
 {
     variants.into_iter().map(|v| v.ident.clone()).collect()
+}
+
+fn impl_meta(input: &mut syn::DeriveInput) {
+    input.attrs.push(syn::parse_quote! {
+        #[cfg_attr(feature = "egui", derive(Editor))]
+    });
 }

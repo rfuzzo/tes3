@@ -5,3 +5,6 @@ mod sort_objects;
 
 mod type_info;
 pub use type_info::*;
+
+#[cfg(feature = "egui")]
+pub mod editor;

@@ -9,7 +9,7 @@ pub struct GameSetting {
     pub value: GameSettingValue,
 }
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Debug, PartialEq, SmartDefault)]
 pub enum GameSettingValue {
     #[default]

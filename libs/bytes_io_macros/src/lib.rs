@@ -163,3 +163,100 @@ fn get_repr(attributes: &[syn::Attribute]) -> syn::Ident {
         })
         .expect("Could not find repr.")
 }
+
+///////////////////////////////////////////////////////////
+/// egui macros
+
+// todo: write a proper editor override
+#[doc(hidden)]
+#[proc_macro_derive(Editor, attributes(editor))]
+pub fn derive_editor(input: TokenStream) -> TokenStream {
+    let input = syn::parse_macro_input!(input as syn::DeriveInput);
+
+    match &input.data {
+        syn::Data::Struct(_) => impl_editor_for_struct(&input),
+        syn::Data::Enum(_) => impl_editor_for_enum(&input),
+        syn::Data::Union(_) => unimplemented!(),
+    }
+}
+
+fn impl_editor_for_struct(input: &syn::DeriveInput) -> TokenStream {
+    let ident = &input.ident;
+    let fields: Vec<_> = get_struct_fields(&input.data).collect();
+
+    if fields.is_empty() {
+        //todo impl_editor_for_bitflags(ident).into()
+        let output = quote! {
+            #input
+        };
+        output.into()
+    } else {
+        let field_names: Vec<_> = fields.iter().map(|id| get_literal_str(id)).collect();
+        let ident_name = get_literal_str(ident);
+
+        impl_editor_for_struct_with_named_fields(ident, ident_name, &fields, &field_names).into()
+    }
+}
+
+fn impl_editor_for_struct_with_named_fields(
+    ident: &syn::Ident,
+    ident_name: syn::LitStr,
+    fields: &[&syn::Ident],
+    field_names: &[syn::LitStr],
+) -> impl Into<TokenStream> {
+    quote! {
+        const _: () = {
+            use crate::prelude::*;
+
+            impl crate::editor::Editor for #ident {
+                fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+                    egui::Grid::new(#ident_name).num_columns(2).striped(true).show(ui, |ui| {
+                        #(
+                            ui.label(
+                                egui::RichText::new(#field_names)
+                                    //.underline()
+                                    .color(egui::Color32::LIGHT_BLUE),
+                            );
+                            self.#fields.add_editor(ui, Some(#field_names.to_owned()));
+                            ui.end_row();
+                        )*
+                    });
+                }
+            }
+        };
+    }
+}
+
+fn impl_editor_for_enum(input: &syn::DeriveInput) -> TokenStream {
+    let variants = match &input.data {
+        syn::Data::Enum(e) => &e.variants,
+        _ => panic!("invalid input"),
+    };
+
+    let ident = &input.ident;
+    let ident_name = get_literal_str(ident);
+    let variant_idents: Vec<_> = variants.iter().map(|v| &v.ident).collect();
+    let variant_strings: Vec<_> = variant_idents.iter().map(|id| get_literal_str(id)).collect();
+
+    let output = quote! {
+        const _: () = {
+            use crate::prelude::*;
+            impl crate::editor::Editor for #ident {
+                fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+                    let mut selected = self.to_owned();
+                    egui::ComboBox::from_label(#ident_name)
+                        .selected_text(format!("{:?}", selected))
+                        .show_ui(ui, |ui| {
+                            #(
+                                ui.selectable_value(&mut selected, #ident::#variant_idents, #variant_strings);
+                            )*
+                        });
+                    *self = selected;
+                }
+            }
+
+        };
+    };
+
+    output.into()
+}

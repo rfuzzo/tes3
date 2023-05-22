@@ -5,7 +5,7 @@ use std::path::Path;
 // internal imports
 use crate::prelude::*;
 
-#[esp_meta]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default)]
 pub struct Plugin {
     pub objects: Vec<TES3Object>,

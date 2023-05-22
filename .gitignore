@@ -1,3 +1,4 @@
 ignore/
 target/
 Cargo.lock
+.DS_Store

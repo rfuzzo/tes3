@@ -1,7 +1,14 @@
 {
-    "[rust]": {
-        "editor.tabSize": 4,
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "rust-lang.rust-analyzer"
-    },
+  "[rust]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "rust-analyzer.showUnlinkedFileNotification": false,
+  "rust-analyzer.check.features": [
+    "egui"
+  ],
+  "rust-analyzer.cargo.features": [
+    "egui"
+  ],
 }

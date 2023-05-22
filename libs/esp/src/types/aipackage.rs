@@ -1,7 +1,7 @@
 // internal imports
 use crate::prelude::*;
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Debug, PartialEq, SmartDefault)]
 pub enum AiPackage {
     #[default]

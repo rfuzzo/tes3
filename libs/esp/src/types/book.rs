@@ -1,7 +1,7 @@
 // internal imports
 use crate::prelude::*;
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Book {
     pub flags: ObjectFlags,
@@ -120,5 +120,51 @@ impl Save for Book {
             stream.save(&0u32)?;
         }
         Ok(())
+    }
+}
+
+#[cfg(feature = "egui")]
+impl crate::editor::Editor for Book {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+        egui::Grid::new("Editor").num_columns(2).striped(true).show(ui, |ui| {
+            ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));
+            self.flags.add_editor(ui, Some("flags".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("id").color(egui::Color32::LIGHT_BLUE));
+            self.id.add_editor(ui, Some("id".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("name").color(egui::Color32::LIGHT_BLUE));
+            self.name.add_editor(ui, Some("name".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("script").color(egui::Color32::LIGHT_BLUE));
+            self.script.add_editor(ui, Some("script".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("mesh").color(egui::Color32::LIGHT_BLUE));
+            self.mesh.add_editor(ui, Some("mesh".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("icon").color(egui::Color32::LIGHT_BLUE));
+            self.icon.add_editor(ui, Some("icon".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("enchanting").color(egui::Color32::LIGHT_BLUE));
+            self.enchanting.add_editor(ui, Some("enchanting".to_owned()));
+            ui.end_row();
+
+            ui.label(egui::RichText::new("data").color(egui::Color32::LIGHT_BLUE));
+            self.data.add_editor(ui, Some("data".to_owned()));
+            ui.end_row();
+
+            // custom editor here
+            ui.label(egui::RichText::new("text").color(egui::Color32::LIGHT_BLUE));
+            egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
+                ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+            });
+            ui.end_row();
+        });
     }
 }

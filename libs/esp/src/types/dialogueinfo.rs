@@ -43,7 +43,7 @@ pub struct Filter {
     pub value: FilterValue,
 }
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Debug, PartialEq, SmartDefault)]
 pub enum FilterValue {
     #[default]
@@ -52,8 +52,9 @@ pub enum FilterValue {
 }
 
 #[esp_meta]
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub enum QuestState {
+    #[default] // todo check this
     Name,
     Finished,
     Restart,

@@ -117,9 +117,9 @@ impl crate::editor::Editor for Script {
             ui.end_row();
 
             // custom editor here
-            ui.label(egui::RichText::new("script_text").color(egui::Color32::LIGHT_BLUE));
+            ui.label(egui::RichText::new("text").color(egui::Color32::LIGHT_BLUE));
             egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
-                ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.script_text));
+                ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
             });
             ui.end_row();
         });

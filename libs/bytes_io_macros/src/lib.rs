@@ -234,7 +234,6 @@ fn impl_editor_for_enum(input: &syn::DeriveInput) -> TokenStream {
     };
 
     let ident = &input.ident;
-    let ident_name = get_literal_str(ident);
     let variant_idents: Vec<_> = variants.iter().map(|v| &v.ident).collect();
     let variant_strings: Vec<_> = variant_idents.iter().map(|id| get_literal_str(id)).collect();
 
@@ -243,18 +242,19 @@ fn impl_editor_for_enum(input: &syn::DeriveInput) -> TokenStream {
             use crate::prelude::*;
             impl crate::editor::Editor for #ident {
                 fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
-                    let mut selected = self.to_owned();
-                    egui::ComboBox::from_label(#ident_name)
-                        .selected_text(format!("{:?}", selected))
-                        .show_ui(ui, |ui| {
-                            #(
-                                ui.selectable_value(&mut selected, #ident::#variant_idents, #variant_strings);
-                            )*
-                        });
-                    *self = selected;
+                    if let Some(nam) = name {
+                        let mut selected = self.to_owned();
+                        egui::ComboBox::from_label(nam)
+                            .selected_text(format!("{:?}", selected))
+                            .show_ui(ui, |ui| {
+                                #(
+                                    ui.selectable_value(&mut selected, #ident::#variant_idents, #variant_strings);
+                                )*
+                            });
+                        *self = selected;
+                    }
                 }
             }
-
         };
     };
 

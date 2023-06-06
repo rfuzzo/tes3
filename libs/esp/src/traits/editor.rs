@@ -4,36 +4,36 @@ use crate::prelude::*;
 /// provides egui widgets for implementing types
 pub trait Editor {
     /// adds an egui widget to the ui
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>);
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String);
 }
 
 ///////////////////////////////////////////////////////////////////
 // primitive types
 
 impl Editor for bool {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.checkbox(self, "Checked");
     }
 }
 
 impl Editor for f32 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(0.1));
     }
 }
 
 impl Editor for String {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_singleline(self);
     }
 }
 impl Editor for FixedString<32> {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_singleline(&mut self.0);
     }
 }
 impl Editor for FixedString<256> {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_multiline(&mut self.0);
     }
 }
@@ -42,38 +42,38 @@ impl Editor for FixedString<256> {
 // todo refactor with num crate (some traits for integers)?
 
 impl Editor for u8 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
 impl Editor for u16 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
 impl Editor for u32 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
 impl Editor for u64 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
 
 impl Editor for i8 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
 impl Editor for i16 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
 impl Editor for i32 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
 }
@@ -83,7 +83,7 @@ impl<T> Editor for Vec<T>
 where
     T: Editor + std::default::Default,
 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         ui.vertical(|ui| {
             // add and remove buttons
             ui.horizontal(|ui| {
@@ -99,41 +99,41 @@ where
             });
 
             // the vector, allowed to panic here since this always needs a prop name
-            egui::CollapsingHeader::new(name.unwrap()).show(ui, |ui| {
-                for (i, element) in self.iter_mut().enumerate() {
-                    ui.push_id(i, |ui| {
-                        element.add_editor(ui, None);
-                    });
-                }
+            ui.push_id(name.clone(), |ui| {
+                egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
+                    for (i, element) in self.iter_mut().enumerate() {
+                        element.add_editor(ui, format!("{}.{}", name, i));
+                    }
+                });
             });
         });
     }
 }
 
 impl<const N: usize> Editor for [AttributeId; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [FactionRequirement; 10] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [SkillId; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [EffectId; 4] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 
 // colors
 impl Editor for [u8; 4] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut color: ecolor::Color32 = ecolor::Color32::from_rgba_premultiplied(self[0], self[1], self[2], self[3]);
         ui.color_edit_button_srgba(&mut color);
         self[0] = color.r();
@@ -145,97 +145,95 @@ impl Editor for [u8; 4] {
 
 // slices
 impl Editor for [u8; 3] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [u8; 8] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [u8; 9] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [u8; 16] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [u8; 27] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 
 impl<const N: usize> Editor for [i8; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [i32; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [u16; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [f32; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 
 impl<const N: usize> Editor for [[u16; 16]; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [[u8; 9]; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [[i8; 3]; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [[u8; 3]; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl<const N: usize> Editor for [[i8; 65]; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 
 impl Editor for [[[i8; 3]; 65]; 65] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 impl Editor for [[[u8; 3]; 65]; 65] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
 }
 
-fn add_slice_editor<T: Editor, const N: usize>(slice: &mut [T; N], ui: &mut egui::Ui, name: Option<String>) {
+fn add_slice_editor<T: Editor, const N: usize>(slice: &mut [T; N], ui: &mut egui::Ui, name: String) {
     ui.vertical(|ui| {
         // the vector, allowed to panic here since this always needs a prop name
-        egui::CollapsingHeader::new(name.unwrap()).show(ui, |ui| {
+        egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
             for (i, element) in slice.iter_mut().enumerate() {
-                ui.push_id(i, |ui| {
-                    element.add_editor(ui, None);
-                });
+                element.add_editor(ui, format!("{}.{}", name, i));
             }
         });
     });
@@ -246,7 +244,7 @@ impl<S> Editor for HashMap<u32, S>
 where
     S: Editor,
 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         ui.vertical(|ui| {
             // add and remove buttons
             ui.horizontal(|ui| {
@@ -259,11 +257,11 @@ where
             });
 
             // the vector, allowed to panic here since this always needs a prop name
-            egui::CollapsingHeader::new(name.unwrap()).show(ui, |ui| {
+            egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
                 for (key, element) in self {
                     ui.horizontal(|ui| {
                         ui.label(key.to_string());
-                        element.add_editor(ui, None);
+                        element.add_editor(ui, format!("{}.{}", name, key));
                     });
                 }
             });
@@ -275,7 +273,7 @@ impl<S> Editor for HashMap<u64, S>
 where
     S: Editor,
 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         ui.vertical(|ui| {
             // add and remove buttons
             ui.horizontal(|ui| {
@@ -288,11 +286,11 @@ where
             });
 
             // the vector
-            egui::CollapsingHeader::new(name.unwrap()).show(ui, |ui| {
+            egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
                 for (key, element) in self {
                     ui.horizontal(|ui| {
                         ui.label(key.to_string());
-                        element.add_editor(ui, None);
+                        element.add_editor(ui, format!("{}.{}", name, key));
                     });
                 }
             });
@@ -304,7 +302,7 @@ impl<S> Editor for HashMap<(u32, u32), S>
 where
     S: Editor,
 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         ui.vertical(|ui| {
             // add and remove buttons
             ui.horizontal(|ui| {
@@ -317,16 +315,18 @@ where
             });
 
             // the vector
-            egui::CollapsingHeader::new(name.unwrap()).show(ui, |ui| {
-                for (i, (key, element)) in self.iter_mut().enumerate() {
-                    ui.push_id(i, |ui| {
-                        ui.horizontal(|ui| {
-                            let label = format!("{},{}", key.0, key.1);
-                            ui.label(label);
-                            element.add_editor(ui, None);
+            ui.push_id(format!("{}.ch", name), |ui| {
+                egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
+                    for (i, (key, element)) in self.iter_mut().enumerate() {
+                        ui.push_id(format!("{}.h.{}", name, i), |ui| {
+                            ui.horizontal(|ui| {
+                                let label = format!("{},{}", key.0, key.1);
+                                ui.label(label);
+                                element.add_editor(ui, format!("{}.{}", name, i));
+                            });
                         });
-                    });
-                }
+                    }
+                });
             });
         });
     }
@@ -334,16 +334,16 @@ where
 
 // tuples
 impl<S: Editor, T: Editor> Editor for (S, T) {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
-        self.0.add_editor(ui, None);
-        self.1.add_editor(ui, None);
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+        self.0.add_editor(ui, format!("{}.{}", name, 0));
+        self.1.add_editor(ui, format!("{}.{}", name, 1));
     }
 }
 impl<S: Editor, T: Editor, U: Editor> Editor for (S, T, U) {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
-        self.0.add_editor(ui, None);
-        self.1.add_editor(ui, None);
-        self.2.add_editor(ui, None);
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+        self.0.add_editor(ui, format!("{}.{}", name, 0));
+        self.1.add_editor(ui, format!("{}.{}", name, 1));
+        self.2.add_editor(ui, format!("{}.{}", name, 2));
     }
 }
 
@@ -352,7 +352,7 @@ impl<T> Editor for Option<T>
 where
     T: Editor + std::default::Default,
 {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         if let Some(value) = self {
             // if it's Some we simply display the editor
             value.add_editor(ui, name);
@@ -368,7 +368,7 @@ where
 // boxes
 // check this!!
 impl<T: Editor> Editor for Box<T> {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         let x = self.as_mut();
         x.add_editor(ui, name);
     }
@@ -379,7 +379,7 @@ impl<T: Editor> Editor for Box<T> {
 // todo: refactor into macro
 
 impl Editor for ObjectFlags {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut value = self.bits();
         ui.add(egui::DragValue::new(&mut value).speed(1));
         if let Some(v) = ObjectFlags::from_bits(value) {
@@ -388,7 +388,7 @@ impl Editor for ObjectFlags {
     }
 }
 impl Editor for LandscapeFlags {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut value = self.bits();
         ui.add(egui::DragValue::new(&mut value).speed(1));
         if let Some(v) = LandscapeFlags::from_bits(value) {
@@ -397,7 +397,7 @@ impl Editor for LandscapeFlags {
     }
 }
 impl Editor for CellFlags {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut value = self.bits();
         ui.add(egui::DragValue::new(&mut value).speed(1));
         if let Some(v) = CellFlags::from_bits(value) {
@@ -410,7 +410,7 @@ impl Editor for CellFlags {
 // missing editor impls for variant enums
 
 impl Editor for AiPackage {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut selected = self.to_owned();
         egui::ComboBox::from_label("Select one!")
             .selected_text(format!("{:?}", selected))
@@ -426,7 +426,7 @@ impl Editor for AiPackage {
 }
 
 impl Editor for FilterValue {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut selected = self.to_owned();
         egui::ComboBox::from_label("Select one!")
             .selected_text(format!("{:?}", selected))
@@ -439,7 +439,7 @@ impl Editor for FilterValue {
 }
 
 impl Editor for GameSettingValue {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut selected = self.to_owned();
         egui::ComboBox::from_label("Select one!")
             .selected_text(format!("{:?}", selected))

@@ -125,46 +125,51 @@ impl Save for Book {
 
 #[cfg(feature = "egui")]
 impl crate::editor::Editor for Book {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
-        egui::Grid::new("Editor").num_columns(2).striped(true).show(ui, |ui| {
-            ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));
-            self.flags.add_editor(ui, Some("flags".to_owned()));
-            ui.end_row();
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+        egui::Grid::new(format!("{}.Editor", name))
+            .num_columns(2)
+            .striped(true)
+            .show(ui, |ui| {
+                ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));
+                self.flags.add_editor(ui, format!("{}.flags", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("id").color(egui::Color32::LIGHT_BLUE));
-            self.id.add_editor(ui, Some("id".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("id").color(egui::Color32::LIGHT_BLUE));
+                self.id.add_editor(ui, format!("{}.id", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("name").color(egui::Color32::LIGHT_BLUE));
-            self.name.add_editor(ui, Some("name".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("name").color(egui::Color32::LIGHT_BLUE));
+                self.name.add_editor(ui, format!("{}.name", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("script").color(egui::Color32::LIGHT_BLUE));
-            self.script.add_editor(ui, Some("script".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("script").color(egui::Color32::LIGHT_BLUE));
+                self.script.add_editor(ui, format!("{}.script", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("mesh").color(egui::Color32::LIGHT_BLUE));
-            self.mesh.add_editor(ui, Some("mesh".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("mesh").color(egui::Color32::LIGHT_BLUE));
+                self.mesh.add_editor(ui, format!("{}.mesh", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("icon").color(egui::Color32::LIGHT_BLUE));
-            self.icon.add_editor(ui, Some("icon".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("icon").color(egui::Color32::LIGHT_BLUE));
+                self.icon.add_editor(ui, format!("{}.icon", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("enchanting").color(egui::Color32::LIGHT_BLUE));
-            self.enchanting.add_editor(ui, Some("enchanting".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("enchanting").color(egui::Color32::LIGHT_BLUE));
+                self.enchanting.add_editor(ui, format!("{}.enchanting", name));
+                ui.end_row();
 
-            ui.label(egui::RichText::new("data").color(egui::Color32::LIGHT_BLUE));
-            self.data.add_editor(ui, Some("data".to_owned()));
-            ui.end_row();
+                ui.label(egui::RichText::new("data").color(egui::Color32::LIGHT_BLUE));
+                self.data.add_editor(ui, format!("{}.data", name));
+                ui.end_row();
 
-            // custom editor here
-            ui.label(egui::RichText::new("text").color(egui::Color32::LIGHT_BLUE));
-            egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
-                ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+                // custom editor here
+                ui.label(egui::RichText::new("text").color(egui::Color32::LIGHT_BLUE));
+                ui.push_id(format!("{}.text", name), |ui| {
+                    egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
+                        ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+                    });
+                });
+                ui.end_row();
             });
-            ui.end_row();
-        });
     }
 }

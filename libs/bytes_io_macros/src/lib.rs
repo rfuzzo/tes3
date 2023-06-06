@@ -200,7 +200,7 @@ fn impl_editor_for_struct(input: &syn::DeriveInput) -> TokenStream {
 
 fn impl_editor_for_struct_with_named_fields(
     ident: &syn::Ident,
-    ident_name: syn::LitStr,
+    _ident_name: syn::LitStr,
     fields: &[&syn::Ident],
     field_names: &[syn::LitStr],
 ) -> impl Into<TokenStream> {
@@ -209,15 +209,12 @@ fn impl_editor_for_struct_with_named_fields(
             use crate::prelude::*;
 
             impl crate::editor::Editor for #ident {
-                fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
-                    egui::Grid::new(#ident_name).num_columns(2).striped(true).show(ui, |ui| {
+                fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+                    egui::Grid::new(name.clone()).num_columns(2).striped(true).show(ui, |ui| {
                         #(
-                            ui.label(
-                                egui::RichText::new(#field_names)
-                                    //.underline()
-                                    .color(egui::Color32::LIGHT_BLUE),
-                            );
-                            self.#fields.add_editor(ui, Some(#field_names.to_owned()));
+                            ui.label(egui::RichText::new(#field_names).color(egui::Color32::LIGHT_BLUE));
+
+                            self.#fields.add_editor(ui, format!("{}.{}", name, #field_names));
                             ui.end_row();
                         )*
                     });
@@ -241,18 +238,18 @@ fn impl_editor_for_enum(input: &syn::DeriveInput) -> TokenStream {
         const _: () = {
             use crate::prelude::*;
             impl crate::editor::Editor for #ident {
-                fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
-                    if let Some(nam) = name {
-                        let mut selected = self.to_owned();
-                        egui::ComboBox::from_label(nam)
+                fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+                    let mut selected = self.to_owned();
+                    ui.push_id(name.clone(), |ui| {
+                        egui::ComboBox::from_label(name)
                             .selected_text(format!("{:?}", selected))
                             .show_ui(ui, |ui| {
                                 #(
                                     ui.selectable_value(&mut selected, #ident::#variant_idents, #variant_strings);
                                 )*
                             });
-                        *self = selected;
-                    }
+                    });
+                    *self = selected;
                 }
             }
         };

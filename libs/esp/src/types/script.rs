@@ -94,32 +94,34 @@ impl Save for Script {
 
 #[cfg(feature = "egui")]
 impl crate::editor::Editor for Script {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: Option<String>) {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         egui::Grid::new("Editor").num_columns(2).striped(true).show(ui, |ui| {
             ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));
-            self.flags.add_editor(ui, Some("flags".to_owned()));
+            self.flags.add_editor(ui, format!("{}.flags", name));
             ui.end_row();
 
             ui.label(egui::RichText::new("id").color(egui::Color32::LIGHT_BLUE));
-            self.id.add_editor(ui, Some("id".to_owned()));
+            self.id.add_editor(ui, format!("{}.id", name));
             ui.end_row();
 
             ui.label(egui::RichText::new("header").color(egui::Color32::LIGHT_BLUE));
-            self.header.add_editor(ui, Some("header".to_owned()));
+            self.header.add_editor(ui, format!("{}.header", name));
             ui.end_row();
 
             ui.label(egui::RichText::new("variables").color(egui::Color32::LIGHT_BLUE));
-            self.variables.add_editor(ui, Some("variables".to_owned()));
+            self.variables.add_editor(ui, format!("{}.variables", name));
             ui.end_row();
 
             ui.label(egui::RichText::new("bytecode").color(egui::Color32::LIGHT_BLUE));
-            self.bytecode.add_editor(ui, Some("bytecode".to_owned()));
+            self.bytecode.add_editor(ui, format!("{}.bytecode", name));
             ui.end_row();
 
             // custom editor here
             ui.label(egui::RichText::new("text").color(egui::Color32::LIGHT_BLUE));
-            egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
-                ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+            ui.push_id(format!("{}.text", name), |ui| {
+                egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
+                    ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+                });
             });
             ui.end_row();
         });

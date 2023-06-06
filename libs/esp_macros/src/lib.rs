@@ -155,10 +155,10 @@ fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
 
         #[cfg(feature = "egui")]
         impl Editor for TES3Object {
-            fn add_editor(&mut self, ui: &mut egui::Ui, name: Option<String>) {
+            fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
                 match self {
                     #(
-                        TES3Object::#idents(obj) => obj.add_editor(ui, None),
+                        TES3Object::#idents(obj) => obj.add_editor(ui, name),
                     )*
                 }
             }

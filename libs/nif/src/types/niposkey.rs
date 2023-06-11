@@ -25,7 +25,7 @@ pub struct NiBezPosKey {
     pub time: f32,
     pub value: Vec3,
     pub in_tan: Vec3,
-    pub out_an: Vec3,
+    pub out_tan: Vec3,
 }
 
 #[derive(Meta, Clone, Copy, Debug, Default, PartialEq, Pod, Zeroable)]
@@ -33,9 +33,9 @@ pub struct NiBezPosKey {
 pub struct NiTCBPosKey {
     pub time: f32,
     pub value: Vec3,
-    pub t: f32,
-    pub c: f32,
-    pub b: f32,
+    pub tension: f32,
+    pub continuity: f32,
+    pub bias: f32,
 }
 
 impl Load for NiPosKey {

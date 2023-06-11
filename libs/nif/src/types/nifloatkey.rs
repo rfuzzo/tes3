@@ -25,7 +25,7 @@ pub struct NiBezFloatKey {
     pub time: f32,
     pub value: f32,
     pub in_tan: f32,
-    pub out_an: f32,
+    pub out_tan: f32,
 }
 
 #[derive(Meta, Clone, Copy, Debug, Default, PartialEq, Pod, Zeroable)]
@@ -33,9 +33,9 @@ pub struct NiBezFloatKey {
 pub struct NiTCBFloatKey {
     pub time: f32,
     pub value: f32,
-    pub t: f32,
-    pub c: f32,
-    pub b: f32,
+    pub tension: f32,
+    pub continuity: f32,
+    pub bias: f32,
 }
 
 impl Load for NiFloatKey {

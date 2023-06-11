@@ -241,7 +241,7 @@ fn impl_editor_for_enum(input: &syn::DeriveInput) -> TokenStream {
                 fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
                     let mut selected = self.to_owned();
                     ui.push_id(name.clone(), |ui| {
-                        egui::ComboBox::from_label(name)
+                        egui::ComboBox::from_id_source(name)
                             .selected_text(format!("{:?}", selected))
                             .show_ui(ui, |ui| {
                                 #(

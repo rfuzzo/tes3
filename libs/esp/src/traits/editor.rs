@@ -100,7 +100,7 @@ where
 
             // the vector, allowed to panic here since this always needs a prop name
             ui.push_id(name.clone(), |ui| {
-                egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
+                egui::CollapsingHeader::new("elements").show(ui, |ui| {
                     for (i, element) in self.iter_mut().enumerate() {
                         element.add_editor(ui, format!("{}.{}", name, i));
                     }
@@ -229,12 +229,14 @@ impl Editor for [[[u8; 3]; 65]; 65] {
 }
 
 fn add_slice_editor<T: Editor, const N: usize>(slice: &mut [T; N], ui: &mut egui::Ui, name: String) {
-    ui.vertical(|ui| {
-        // the vector, allowed to panic here since this always needs a prop name
-        egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
-            for (i, element) in slice.iter_mut().enumerate() {
-                element.add_editor(ui, format!("{}.{}", name, i));
-            }
+    // the vector, allowed to panic here since this always needs a prop name
+    ui.push_id(name.clone(), |ui| {
+        egui::CollapsingHeader::new("elements").show(ui, |ui| {
+            ui.vertical(|ui| {
+                for (i, element) in slice.iter_mut().enumerate() {
+                    element.add_editor(ui, format!("{}.{}", name, i));
+                }
+            });
         });
     });
 }
@@ -257,13 +259,15 @@ where
             });
 
             // the vector, allowed to panic here since this always needs a prop name
-            egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
-                for (key, element) in self {
-                    ui.horizontal(|ui| {
-                        ui.label(key.to_string());
-                        element.add_editor(ui, format!("{}.{}", name, key));
-                    });
-                }
+            ui.push_id(name.clone(), |ui| {
+                egui::CollapsingHeader::new("elements").show(ui, |ui| {
+                    for (key, element) in self {
+                        ui.horizontal(|ui| {
+                            ui.label(key.to_string());
+                            element.add_editor(ui, format!("{}.{}", name, key));
+                        });
+                    }
+                });
             });
         });
     }
@@ -286,13 +290,15 @@ where
             });
 
             // the vector
-            egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
-                for (key, element) in self {
-                    ui.horizontal(|ui| {
-                        ui.label(key.to_string());
-                        element.add_editor(ui, format!("{}.{}", name, key));
-                    });
-                }
+            ui.push_id(name.clone(), |ui| {
+                egui::CollapsingHeader::new("elements").show(ui, |ui| {
+                    for (key, element) in self {
+                        ui.horizontal(|ui| {
+                            ui.label(key.to_string());
+                            element.add_editor(ui, format!("{}.{}", name, key));
+                        });
+                    }
+                });
             });
         });
     }
@@ -316,7 +322,7 @@ where
 
             // the vector
             ui.push_id(format!("{}.ch", name), |ui| {
-                egui::CollapsingHeader::new(name.clone()).show(ui, |ui| {
+                egui::CollapsingHeader::new("elements").show(ui, |ui| {
                     for (i, (key, element)) in self.iter_mut().enumerate() {
                         ui.push_id(format!("{}.h.{}", name, i), |ui| {
                             ui.horizontal(|ui| {

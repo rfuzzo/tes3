@@ -95,7 +95,7 @@ impl Save for Script {
 #[cfg(feature = "egui")]
 impl crate::editor::Editor for Script {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
-        egui::Grid::new("Editor").num_columns(2).striped(true).show(ui, |ui| {
+        egui::Grid::new(name.clone()).num_columns(2).striped(true).show(ui, |ui| {
             ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));
             self.flags.add_editor(ui, format!("{}.flags", name));
             ui.end_row();
@@ -120,7 +120,8 @@ impl crate::editor::Editor for Script {
             ui.label(egui::RichText::new("text").color(egui::Color32::LIGHT_BLUE));
             ui.push_id(format!("{}.text", name), |ui| {
                 egui::ScrollArea::vertical().min_scrolled_height(600.0).show(ui, |ui| {
-                    ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+                    // ui.add_sized(ui.available_size(), egui::TextEdit::multiline(&mut self.text));
+                    ui.add(egui::TextEdit::multiline(&mut self.text));
                 });
             });
             ui.end_row();

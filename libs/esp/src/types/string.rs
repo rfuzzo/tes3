@@ -10,7 +10,7 @@ use crate::prelude::*;
 #[esp_meta(true)]
 #[repr(transparent)]
 #[derive(TransparentWrapper)]
-#[derive(Clone, Debug, Default, Deref, DerefMut, Eq, From, Into, PartialEq)]
+#[derive(Clone, Debug, Default, Deref, Hash, DerefMut, Eq, From, Into, PartialEq)]
 pub struct FixedString<const N: usize>(pub String);
 
 impl<const N: usize> Load for FixedString<N> {

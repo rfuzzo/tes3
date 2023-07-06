@@ -1,8 +1,9 @@
 // internal imports
 use crate::prelude::*;
+use std::hash::Hash;
 
 #[esp_meta(true)]
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 pub struct Script {
     pub flags: ObjectFlags,
     pub id: String,
@@ -126,5 +127,36 @@ impl crate::editor::Editor for Script {
             });
             ui.end_row();
         });
+    }
+}
+
+#[cfg(feature = "egui")]
+impl crate::editor::EditorList for Script {
+    fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor> {
+        vec![
+            &mut self.flags,
+            &mut self.id,
+            &mut self.header,
+            &mut self.variables,
+            &mut self.bytecode,
+            &mut self.text,
+        ]
+    }
+
+    fn get_editor_names(&self) -> Vec<String> {
+        vec![
+            "flags".to_owned(),
+            "id".to_owned(),
+            "header".to_owned(),
+            "variables".to_owned(),
+            "bytecode".to_owned(),
+            "text".to_owned(),
+        ]
+    }
+
+    fn get_hash(&self) -> u64 {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        self.hash(&mut hasher);
+        std::hash::Hasher::finish(&hasher)
     }
 }

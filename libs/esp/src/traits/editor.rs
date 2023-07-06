@@ -7,6 +7,14 @@ pub trait Editor {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String);
 }
 
+/// EditorList trait
+/// provides a list of mutable objects implementing the Editor trait
+pub trait EditorList {
+    fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor>;
+    fn get_editor_names(&self) -> Vec<String>;
+    fn get_hash(&self) -> u64;
+}
+
 ///////////////////////////////////////////////////////////////////
 // primitive types
 
@@ -27,6 +35,7 @@ impl Editor for String {
         ui.text_edit_singleline(self);
     }
 }
+
 impl Editor for FixedString<32> {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_singleline(&mut self.0);

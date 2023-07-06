@@ -1,8 +1,9 @@
 // internal imports
 use crate::prelude::*;
+use std::hash::{Hash, Hasher};
 
 #[esp_meta(true)]
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Hash)]
 pub struct Book {
     pub flags: ObjectFlags,
     pub id: String,
@@ -171,5 +172,42 @@ impl crate::editor::Editor for Book {
                 });
                 ui.end_row();
             });
+    }
+}
+
+#[cfg(feature = "egui")]
+impl crate::editor::EditorList for Book {
+    fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor> {
+        vec![
+            &mut self.flags,
+            &mut self.id,
+            &mut self.name,
+            &mut self.script,
+            &mut self.mesh,
+            &mut self.icon,
+            &mut self.enchanting,
+            &mut self.text,
+            &mut self.data,
+        ]
+    }
+
+    fn get_editor_names(&self) -> Vec<String> {
+        vec![
+            "flags".to_owned(),
+            "id".to_owned(),
+            "name".to_owned(),
+            "script".to_owned(),
+            "mesh".to_owned(),
+            "icon".to_owned(),
+            "enchanting".to_owned(),
+            "text".to_owned(),
+            "data".to_owned(),
+        ]
+    }
+
+    fn get_hash(&self) -> u64 {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
     }
 }

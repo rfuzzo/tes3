@@ -12,7 +12,6 @@ pub trait Editor {
 pub trait EditorList {
     fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor>;
     fn get_editor_names(&self) -> Vec<String>;
-    fn get_hash(&self) -> u64;
 }
 
 ///////////////////////////////////////////////////////////////////

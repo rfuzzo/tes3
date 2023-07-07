@@ -182,13 +182,7 @@ fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
                     )*
                 }
             }
-            fn get_hash(&self) -> u64 {
-                match self {
-                    #(
-                        TES3Object::#idents(obj) => obj.get_hash(),
-                    )*
-                }
-            }
+
         }
     }
 }
@@ -231,6 +225,6 @@ where
 
 fn impl_meta(input: &mut syn::DeriveInput) {
     input.attrs.push(syn::parse_quote! {
-        #[cfg_attr(feature = "egui", derive(Editor, EditorList, Hash))]
+        #[cfg_attr(feature = "egui", derive(Editor, EditorList))]
     });
 }

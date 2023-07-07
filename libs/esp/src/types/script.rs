@@ -1,9 +1,8 @@
 // internal imports
 use crate::prelude::*;
-use std::hash::Hash;
 
 #[esp_meta(true)]
-#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct Script {
     pub flags: ObjectFlags,
     pub id: String,
@@ -152,11 +151,5 @@ impl crate::editor::EditorList for Script {
             "bytecode".to_owned(),
             "text".to_owned(),
         ]
-    }
-
-    fn get_hash(&self) -> u64 {
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        self.hash(&mut hasher);
-        std::hash::Hasher::finish(&hasher)
     }
 }

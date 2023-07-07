@@ -1,9 +1,8 @@
 // internal imports
 use crate::prelude::*;
-use std::hash::{Hash, Hasher};
 
 #[esp_meta(true)]
-#[derive(Clone, Debug, Default, PartialEq, Hash)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Book {
     pub flags: ObjectFlags,
     pub id: String,
@@ -203,11 +202,5 @@ impl crate::editor::EditorList for Book {
             "text".to_owned(),
             "data".to_owned(),
         ]
-    }
-
-    fn get_hash(&self) -> u64 {
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        self.hash(&mut hasher);
-        hasher.finish()
     }
 }

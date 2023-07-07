@@ -316,12 +316,6 @@ fn impl_editor_list_for_struct_with_named_fields(
                         )*
                     ]
                 }
-
-                fn get_hash(&self) -> u64 {
-                    let mut hasher = std::collections::hash_map::DefaultHasher::new();
-                    self.hash(&mut hasher);
-                    hasher.finish()
-                }
             }
         };
     }
@@ -348,11 +342,7 @@ fn impl_editor_list_for_enum(input: &syn::DeriveInput) -> TokenStream {
                 fn get_editor_names(&self) -> Vec<String> {
                     vec![]
                 }
-                fn get_hash(&self) -> u64 {
-                    let mut hasher = std::collections::hash_map::DefaultHasher::new();
-                    self.hash(&mut hasher);
-                    hasher.finish()
-                }
+
             }
         };
     };

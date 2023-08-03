@@ -173,25 +173,31 @@ impl<const N: usize> Editor for [AttributeId; N] {
         add_slice_editor(self, ui, name);
     }
     fn to_json(&self) -> String {
-        if let Ok(s) = serde_json::to_string(self) {
-            return s;
-        }
-        "".to_owned()
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
 }
 impl Editor for [FactionRequirement; 10] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
 }
 impl<const N: usize> Editor for [SkillId; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
 }
 impl Editor for [EffectId; 4] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
 }
 
@@ -205,6 +211,12 @@ impl Editor for [u8; 4] {
         self[2] = color.b();
         self[3] = color.a();
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 
 // slices
@@ -212,25 +224,55 @@ impl Editor for [u8; 3] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 impl Editor for [u8; 8] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 impl Editor for [u8; 9] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 impl Editor for [u8; 16] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 impl Editor for [u8; 27] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 
@@ -238,20 +280,32 @@ impl<const N: usize> Editor for [i8; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
+    }
 }
 impl<const N: usize> Editor for [i32; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
     }
 }
 impl<const N: usize> Editor for [u16; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
+    }
 }
 impl<const N: usize> Editor for [f32; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
     }
 }
 
@@ -259,36 +313,66 @@ impl<const N: usize> Editor for [[u16; 16]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
 }
 impl<const N: usize> Editor for [[u8; 9]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
+}
+impl Editor for [[i8; 65]; 65] {
+    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+        add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
 }
 impl<const N: usize> Editor for [[i8; 3]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
 }
-impl<const N: usize> Editor for [[u8; 3]; N] {
+// impl<const N: usize> Editor for [[u8; 3]; N] {
+//     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
+//         add_slice_editor(self, ui, name);
+//     }
+//     fn to_json(&self) -> String {
+//         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+//     }
+// }
+
+impl<const N: usize> Editor for [[[i8; 3]; 65]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }
-}
-impl<const N: usize> Editor for [[i8; 65]; N] {
-    fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
-        add_slice_editor(self, ui, name);
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
 }
 
-impl Editor for [[[i8; 3]; 65]; 65] {
+impl Editor for [[u8; 3]; 65] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
 }
 impl Editor for [[[u8; 3]; 65]; 65] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
 }
 
@@ -308,7 +392,7 @@ fn add_slice_editor<T: Editor, const N: usize>(slice: &mut [T; N], ui: &mut egui
 // TODO refactor hashmaps
 impl<S> Editor for HashMap<u32, S>
 where
-    S: Editor,
+    S: Editor + serde::Serialize,
 {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         ui.vertical(|ui| {
@@ -334,6 +418,13 @@ where
                 });
             });
         });
+    }
+
+    fn to_json(&self) -> String {
+        self.iter()
+            .map(|e| format!("{}.{}", e.0, e.1.to_json()))
+            .collect::<Vec<_>>()
+            .join("|")
     }
 }
 
@@ -365,6 +456,12 @@ where
                 });
             });
         });
+    }
+    fn to_json(&self) -> String {
+        self.iter()
+            .map(|e| format!("{}.{}", e.0, e.1.to_json()))
+            .collect::<Vec<_>>()
+            .join("|")
     }
 }
 
@@ -400,27 +497,54 @@ where
             });
         });
     }
+    fn to_json(&self) -> String {
+        self.iter()
+            .map(|e| format!("({},{}).{}", e.0 .0, e.0 .1, e.1.to_json()))
+            .collect::<Vec<_>>()
+            .join("|")
+    }
 }
 
 // tuples
-impl<S: Editor, T: Editor> Editor for (S, T) {
+impl<S, T> Editor for (S, T)
+where
+    S: Editor + serde::Serialize,
+    T: Editor + serde::Serialize,
+{
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         self.0.add_editor(ui, format!("{}.{}", name, 0));
         self.1.add_editor(ui, format!("{}.{}", name, 1));
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
-impl<S: Editor, T: Editor, U: Editor> Editor for (S, T, U) {
+impl<S, T, U> Editor for (S, T, U)
+where
+    S: Editor + serde::Serialize,
+    T: Editor + serde::Serialize,
+    U: Editor + serde::Serialize,
+{
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         self.0.add_editor(ui, format!("{}.{}", name, 0));
         self.1.add_editor(ui, format!("{}.{}", name, 1));
         self.2.add_editor(ui, format!("{}.{}", name, 2));
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 
 // optionals
 impl<T> Editor for Option<T>
 where
-    T: Editor + std::default::Default,
+    T: Editor + std::default::Default + serde::Serialize,
 {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         if let Some(value) = self {
@@ -433,14 +557,34 @@ where
             }
         }
     }
+    fn to_json(&self) -> String {
+        if let Some(value) = self {
+            if let Ok(s) = serde_json::to_string(value) {
+                return s;
+            }
+            "".to_owned()
+        } else {
+            "".to_owned()
+        }
+    }
 }
 
 // boxes
-// check this!!
-impl<T: Editor> Editor for Box<T> {
+// todo check this!!
+impl<T> Editor for Box<T>
+where
+    T: Editor,
+{
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         let x = self.as_mut();
         x.add_editor(ui, name);
+    }
+    fn to_json(&self) -> String {
+        // let x = self.as_ref();
+        // if let Ok(s) = serde_json::to_string(x) {
+        //     return s;
+        // }
+        "".to_owned()
     }
 }
 
@@ -456,6 +600,12 @@ impl Editor for ObjectFlags {
             *self = v;
         }
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 impl Editor for LandscapeFlags {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -465,6 +615,12 @@ impl Editor for LandscapeFlags {
             *self = v;
         }
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 impl Editor for CellFlags {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -473,6 +629,12 @@ impl Editor for CellFlags {
         if let Some(v) = CellFlags::from_bits(value) {
             *self = v;
         }
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 
@@ -493,6 +655,12 @@ impl Editor for AiPackage {
             });
         *self = selected;
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 
 impl Editor for FilterValue {
@@ -505,6 +673,12 @@ impl Editor for FilterValue {
                 ui.selectable_value(&mut selected, FilterValue::Integer(0), "Integer");
             });
         *self = selected;
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 
@@ -519,5 +693,11 @@ impl Editor for GameSettingValue {
                 ui.selectable_value(&mut selected, GameSettingValue::String("".to_owned()), "String");
             });
         *self = selected;
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }

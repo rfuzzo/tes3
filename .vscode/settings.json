@@ -6,9 +6,11 @@
   },
   "rust-analyzer.showUnlinkedFileNotification": false,
   "rust-analyzer.check.features": [
-    "egui"
+    "egui",
+    "serde"
   ],
   "rust-analyzer.cargo.features": [
-    "egui"
+    "egui",
+    "serde"
   ],
 }

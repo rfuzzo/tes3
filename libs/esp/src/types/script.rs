@@ -127,6 +127,13 @@ impl crate::editor::Editor for Script {
             ui.end_row();
         });
     }
+
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 
 #[cfg(feature = "egui")]

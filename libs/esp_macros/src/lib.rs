@@ -164,6 +164,13 @@ fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
                     )*
                 }
             }
+            fn to_json(&self) -> String {
+                match self {
+                    #(
+                        TES3Object::#idents(obj) => obj.to_json(),
+                    )*
+                }
+            }
         }
 
         #[cfg(feature = "egui")]

@@ -219,6 +219,12 @@ fn impl_editor_for_struct_with_named_fields(
                         )*
                     });
                 }
+                fn to_json(&self) -> String {
+                    if let Ok(s) = serde_json::to_string(self) {
+                        return s;
+                    }
+                    "".to_owned()
+                }
             }
         };
     }
@@ -250,6 +256,12 @@ fn impl_editor_for_enum(input: &syn::DeriveInput) -> TokenStream {
                             });
                     });
                     *self = selected;
+                }
+                fn to_json(&self) -> String {
+                    if let Ok(s) = serde_json::to_string(self) {
+                        return s;
+                    }
+                    "".to_owned()
                 }
             }
         };

@@ -5,6 +5,7 @@ use crate::prelude::*;
 pub trait Editor {
     /// adds an egui widget to the ui
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String);
+    fn to_json(&self) -> String;
 }
 
 /// EditorList trait
@@ -21,11 +22,18 @@ impl Editor for bool {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.checkbox(self, "Checked");
     }
+
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
+    }
 }
 
 impl Editor for f32 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(0.1));
+    }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
     }
 }
 
@@ -33,16 +41,31 @@ impl Editor for String {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_singleline(self);
     }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
+    }
 }
 
 impl Editor for FixedString<32> {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_singleline(&mut self.0);
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 impl Editor for FixedString<256> {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.text_edit_multiline(&mut self.0);
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 
@@ -53,20 +76,32 @@ impl Editor for u8 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
+    }
 }
 impl Editor for u16 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
+    }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
     }
 }
 impl Editor for u32 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
+    }
 }
 impl Editor for u64 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
+    }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
     }
 }
 
@@ -74,22 +109,31 @@ impl Editor for i8 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
+    }
 }
 impl Editor for i16 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
+    }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
     }
 }
 impl Editor for i32 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         ui.add(egui::DragValue::new(self).speed(1));
     }
+    fn to_json(&self) -> String {
+        std::string::ToString::to_string(&self)
+    }
 }
 
 // vectors
 impl<T> Editor for Vec<T>
 where
-    T: Editor + std::default::Default,
+    T: Editor + std::default::Default + serde::Serialize,
 {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         ui.vertical(|ui| {
@@ -116,11 +160,23 @@ where
             });
         });
     }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
 }
 
 impl<const N: usize> Editor for [AttributeId; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
     }
 }
 impl Editor for [FactionRequirement; 10] {

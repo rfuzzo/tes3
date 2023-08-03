@@ -7,14 +7,14 @@ repository.workspace = true
 license.workspace = true
 
 [dependencies]
-bitflags = { version = "^2.4" }
-bstr = { version = "^1.6", default-features = false, features = ["std"] }
-bytemuck = { version = "^1.14", features = ["derive"] }
+bitflags = { version = "^2.3" }
+bstr = { version = "^1.5", default-features = false, features = ["std"] }
+bytemuck = { version = "^1.13", features = ["derive"] }
 bytes_io = { path = "../bytes_io" }
 cow-utils = "^0.1"
 derive_more = "^0.99"
 esp_macros = { path = "../esp_macros" }
-hashbrown = { version = "^0.14", features = ["rayon"] }
+hashbrown = { version = ">=0.12, <1.0", features = ["rayon"] }
 itoa = "^1.0"
 rayon = "^1.7"
 smart-default = "^0.7"
@@ -23,11 +23,12 @@ base64-simd = { version = "^0.8", optional = true }
 ecolor = { version = "^0.22", optional = true }                      # egui related features
 egui = { version = "^0.22", optional = true }
 serde = { version = "^1.0", features = ["derive"], optional = true }
+serde_json = { version = "^1.0" }
 zstd = { version = "^0.12", optional = true }
 
 [dev-dependencies]
-tempfile = "^3.8"
-serde_json = "^1.0"
+tempfile = "^3.5"
+# serde_json = "^1.0"
 
 [features]
 default = []
@@ -41,4 +42,13 @@ serde = [
   "esp_macros/serde",
   "hashbrown/serde",
 ]
-egui = ["dep:egui", "dep:ecolor"]
+egui = [
+  "dep:egui",
+  "dep:ecolor",
+  "dep:serde",
+  "dep:base64-simd",
+  "bitflags/serde",
+  "bstr/serde",
+  "esp_macros/serde",
+  "hashbrown/serde",
+]

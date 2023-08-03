@@ -110,8 +110,6 @@ fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
         use bytes_io::*;
         #[cfg(feature = "egui")]
         use crate::editor::Editor;
-        #[cfg(feature = "egui")]
-        use crate::editor::EditorList;
 
         impl Load for TES3Object {
             fn load(stream: &mut Reader<'_>) -> io::Result<Self> {
@@ -171,25 +169,13 @@ fn tes3object_inherent_impls(idents: &[syn::Ident]) -> impl ToTokens {
                     )*
                 }
             }
-        }
-
-        #[cfg(feature = "egui")]
-        impl EditorList for TES3Object {
-            fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor> {
+            fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
                 match self {
                     #(
                         TES3Object::#idents(obj) => obj.get_editor_list(),
                     )*
                 }
             }
-            fn get_editor_names(&self) -> Vec<String> {
-                match self {
-                    #(
-                        TES3Object::#idents(obj) => obj.get_editor_names(),
-                    )*
-                }
-            }
-
         }
     }
 }
@@ -232,6 +218,6 @@ where
 
 fn impl_meta(input: &mut syn::DeriveInput) {
     input.attrs.push(syn::parse_quote! {
-        #[cfg_attr(feature = "egui", derive(Editor, EditorList))]
+        #[cfg_attr(feature = "egui", derive(Editor))]
     });
 }

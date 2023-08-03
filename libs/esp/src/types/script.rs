@@ -134,29 +134,14 @@ impl crate::editor::Editor for Script {
         }
         "".to_owned()
     }
-}
-
-#[cfg(feature = "egui")]
-impl crate::editor::EditorList for Script {
-    fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor> {
-        vec![
-            &mut self.flags,
-            &mut self.id,
-            &mut self.header,
-            &mut self.variables,
-            &mut self.bytecode,
-            &mut self.text,
-        ]
-    }
-
-    fn get_editor_names(&self) -> Vec<String> {
-        vec![
-            "flags".to_owned(),
-            "id".to_owned(),
-            "header".to_owned(),
-            "variables".to_owned(),
-            "bytecode".to_owned(),
-            "text".to_owned(),
-        ]
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        Some(vec![
+            ("flags", &mut self.flags),
+            ("id", &mut self.id),
+            ("header", &mut self.header),
+            ("variables", &mut self.variables),
+            ("bytecode", &mut self.bytecode),
+            ("text", &mut self.text),
+        ])
     }
 }

@@ -178,35 +178,17 @@ impl crate::editor::Editor for Book {
         }
         "".to_owned()
     }
-}
-
-#[cfg(feature = "egui")]
-impl crate::editor::EditorList for Book {
-    fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor> {
-        vec![
-            &mut self.flags,
-            &mut self.id,
-            &mut self.name,
-            &mut self.script,
-            &mut self.mesh,
-            &mut self.icon,
-            &mut self.enchanting,
-            &mut self.text,
-            &mut self.data,
-        ]
-    }
-
-    fn get_editor_names(&self) -> Vec<String> {
-        vec![
-            "flags".to_owned(),
-            "id".to_owned(),
-            "name".to_owned(),
-            "script".to_owned(),
-            "mesh".to_owned(),
-            "icon".to_owned(),
-            "enchanting".to_owned(),
-            "text".to_owned(),
-            "data".to_owned(),
-        ]
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        Some(vec![
+            ("flags", &mut self.flags),
+            ("id", &mut self.id),
+            ("name", &mut self.name),
+            ("script", &mut self.script),
+            ("mesh", &mut self.mesh),
+            ("icon", &mut self.icon),
+            ("enchanting", &mut self.enchanting),
+            ("text", &mut self.text),
+            ("data", &mut self.data),
+        ])
     }
 }

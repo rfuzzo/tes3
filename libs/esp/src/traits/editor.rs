@@ -6,13 +6,7 @@ pub trait Editor {
     /// adds an egui widget to the ui
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String);
     fn to_json(&self) -> String;
-}
-
-/// EditorList trait
-/// provides a list of mutable objects implementing the Editor trait
-pub trait EditorList {
-    fn get_editor_list(&mut self) -> Vec<&mut dyn editor::Editor>;
-    fn get_editor_names(&self) -> Vec<String>;
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>>;
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -26,6 +20,10 @@ impl Editor for bool {
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
     }
+
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 impl Editor for f32 {
@@ -35,6 +33,9 @@ impl Editor for f32 {
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 impl Editor for String {
@@ -43,6 +44,9 @@ impl Editor for String {
     }
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -56,6 +60,9 @@ impl Editor for FixedString<32> {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for FixedString<256> {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -66,6 +73,9 @@ impl Editor for FixedString<256> {
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -79,6 +89,9 @@ impl Editor for u8 {
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for u16 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -86,6 +99,9 @@ impl Editor for u16 {
     }
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 impl Editor for u32 {
@@ -95,6 +111,9 @@ impl Editor for u32 {
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for u64 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -102,6 +121,9 @@ impl Editor for u64 {
     }
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -112,6 +134,9 @@ impl Editor for i8 {
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for i16 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -120,6 +145,9 @@ impl Editor for i16 {
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for i32 {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -127,6 +155,9 @@ impl Editor for i32 {
     }
     fn to_json(&self) -> String {
         std::string::ToString::to_string(&self)
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -166,6 +197,9 @@ where
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 impl<const N: usize> Editor for [AttributeId; N] {
@@ -175,6 +209,9 @@ impl<const N: usize> Editor for [AttributeId; N] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for [FactionRequirement; 10] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -182,6 +219,9 @@ impl Editor for [FactionRequirement; 10] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 impl<const N: usize> Editor for [SkillId; N] {
@@ -191,6 +231,9 @@ impl<const N: usize> Editor for [SkillId; N] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for [EffectId; 4] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -198,6 +241,9 @@ impl Editor for [EffectId; 4] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -217,6 +263,9 @@ impl Editor for [u8; 4] {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 // slices
@@ -230,6 +279,9 @@ impl Editor for [u8; 3] {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for [u8; 8] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -240,6 +292,9 @@ impl Editor for [u8; 8] {
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 impl Editor for [u8; 9] {
@@ -252,6 +307,9 @@ impl Editor for [u8; 9] {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for [u8; 16] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -262,6 +320,9 @@ impl Editor for [u8; 16] {
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 impl Editor for [u8; 27] {
@@ -274,6 +335,9 @@ impl Editor for [u8; 27] {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 impl<const N: usize> Editor for [i8; N] {
@@ -283,6 +347,9 @@ impl<const N: usize> Editor for [i8; N] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl<const N: usize> Editor for [i32; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -290,6 +357,9 @@ impl<const N: usize> Editor for [i32; N] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 impl<const N: usize> Editor for [u16; N] {
@@ -299,6 +369,9 @@ impl<const N: usize> Editor for [u16; N] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl<const N: usize> Editor for [f32; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -306,6 +379,9 @@ impl<const N: usize> Editor for [f32; N] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_string()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -316,6 +392,9 @@ impl<const N: usize> Editor for [[u16; 16]; N] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl<const N: usize> Editor for [[u8; 9]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -323,6 +402,9 @@ impl<const N: usize> Editor for [[u8; 9]; N] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 impl Editor for [[i8; 65]; 65] {
@@ -332,6 +414,9 @@ impl Editor for [[i8; 65]; 65] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl<const N: usize> Editor for [[i8; 3]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -340,15 +425,10 @@ impl<const N: usize> Editor for [[i8; 3]; N] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
-// impl<const N: usize> Editor for [[u8; 3]; N] {
-//     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
-//         add_slice_editor(self, ui, name);
-//     }
-//     fn to_json(&self) -> String {
-//         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
-//     }
-// }
 
 impl<const N: usize> Editor for [[[i8; 3]; 65]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -356,6 +436,9 @@ impl<const N: usize> Editor for [[[i8; 3]; 65]; N] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -366,6 +449,9 @@ impl Editor for [[u8; 3]; 65] {
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for [[[u8; 3]; 65]; 65] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
@@ -373,6 +459,9 @@ impl Editor for [[[u8; 3]; 65]; 65] {
     }
     fn to_json(&self) -> String {
         self.iter().map(|e| e.to_json()).collect::<Vec<_>>().join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -426,6 +515,9 @@ where
             .collect::<Vec<_>>()
             .join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 impl<S> Editor for HashMap<u64, S>
@@ -462,6 +554,9 @@ where
             .map(|e| format!("{}.{}", e.0, e.1.to_json()))
             .collect::<Vec<_>>()
             .join("|")
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -503,6 +598,9 @@ where
             .collect::<Vec<_>>()
             .join("|")
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 // tuples
@@ -521,6 +619,9 @@ where
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl<S, T, U> Editor for (S, T, U)
 where
@@ -538,6 +639,9 @@ where
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -567,6 +671,9 @@ where
             "".to_owned()
         }
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 // boxes
@@ -585,6 +692,9 @@ where
         //     return s;
         // }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -606,6 +716,9 @@ impl Editor for ObjectFlags {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for LandscapeFlags {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -621,6 +734,9 @@ impl Editor for LandscapeFlags {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 impl Editor for CellFlags {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
@@ -635,6 +751,9 @@ impl Editor for CellFlags {
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -661,6 +780,9 @@ impl Editor for AiPackage {
         }
         "".to_owned()
     }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
+    }
 }
 
 impl Editor for FilterValue {
@@ -679,6 +801,9 @@ impl Editor for FilterValue {
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }
 
@@ -699,5 +824,8 @@ impl Editor for GameSettingValue {
             return s;
         }
         "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+        None
     }
 }

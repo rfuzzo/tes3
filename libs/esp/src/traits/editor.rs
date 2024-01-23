@@ -699,65 +699,6 @@ where
 }
 
 ///////////////////////////////////////////////////////////////////
-// flags
-// todo: refactor into macro
-
-impl Editor for ObjectFlags {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
-        let mut value = self.bits();
-        ui.add(egui::DragValue::new(&mut value).speed(1));
-        if let Some(v) = ObjectFlags::from_bits(value) {
-            *self = v;
-        }
-    }
-    fn to_json(&self) -> String {
-        if let Ok(s) = serde_json::to_string(self) {
-            return s;
-        }
-        "".to_owned()
-    }
-    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
-        None
-    }
-}
-impl Editor for LandscapeFlags {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
-        let mut value = self.bits();
-        ui.add(egui::DragValue::new(&mut value).speed(1));
-        if let Some(v) = LandscapeFlags::from_bits(value) {
-            *self = v;
-        }
-    }
-    fn to_json(&self) -> String {
-        if let Ok(s) = serde_json::to_string(self) {
-            return s;
-        }
-        "".to_owned()
-    }
-    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
-        None
-    }
-}
-impl Editor for CellFlags {
-    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
-        let mut value = self.bits();
-        ui.add(egui::DragValue::new(&mut value).speed(1));
-        if let Some(v) = CellFlags::from_bits(value) {
-            *self = v;
-        }
-    }
-    fn to_json(&self) -> String {
-        if let Ok(s) = serde_json::to_string(self) {
-            return s;
-        }
-        "".to_owned()
-    }
-    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
-        None
-    }
-}
-
-///////////////////////////////////////////////////////////////////
 // missing editor impls for variant enums
 
 impl Editor for AiPackage {

@@ -43,7 +43,7 @@ pub struct Filter {
     pub value: FilterValue,
 }
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Debug, PartialEq, SmartDefault)]
 pub enum FilterValue {
     #[default]

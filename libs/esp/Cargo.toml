@@ -20,11 +20,11 @@ rayon = "^1.7"
 smart-default = "^0.7"
 # serde-related features
 base64-simd = { version = "^0.8", optional = true }
-ecolor = { version = "^0.22", optional = true }                      # egui related features
-egui = { version = "^0.22", optional = true }
+ecolor = { version = "^0.25", optional = true }                      # egui related features
+egui = { version = "^0.25", optional = true }
 serde = { version = "^1.0", features = ["derive"], optional = true }
 serde_json = { version = "^1.0" }
-zstd = { version = "^0.12", optional = true }
+zstd = { version = "^0.13", optional = true }
 
 [dev-dependencies]
 tempfile = "^3.5"

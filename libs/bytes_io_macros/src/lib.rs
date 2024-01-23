@@ -185,22 +185,46 @@ fn impl_editor_for_struct(input: &syn::DeriveInput) -> TokenStream {
     let fields: Vec<_> = get_struct_fields(&input.data).collect();
 
     if fields.is_empty() {
-        //todo impl_editor_for_bitflags(ident).into()
-        let output = quote! {
-            #input
-        };
-        output.into()
+        impl_editor_for_bitflags(ident).into()
+        // let output = quote! {
+        //     #input
+        // };
+        // output.into()
     } else {
         let field_names: Vec<_> = fields.iter().map(|id| get_literal_str(id)).collect();
-        let ident_name = get_literal_str(ident);
+        impl_editor_for_struct_with_named_fields(ident, &fields, &field_names).into()
+    }
+}
 
-        impl_editor_for_struct_with_named_fields(ident, ident_name, &fields, &field_names).into()
+fn impl_editor_for_bitflags(ident: &syn::Ident) -> impl Into<TokenStream> {
+    quote! {
+        const _: () = {
+            use crate::prelude::*;
+
+            impl crate::editor::Editor for #ident {
+                fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
+                    let mut value = self.bits();
+                    ui.add(egui::DragValue::new(&mut value).speed(1));
+                    if let Some(v) = #ident::from_bits(value) {
+                        *self = v;
+                    }
+                }
+                fn to_json(&self) -> String {
+                    if let Ok(s) = serde_json::to_string(self) {
+                        return s;
+                    }
+                    "".to_owned()
+                }
+                fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn editor::Editor)>> {
+                    None
+                }
+            }
+        };
     }
 }
 
 fn impl_editor_for_struct_with_named_fields(
     ident: &syn::Ident,
-    _ident_name: syn::LitStr,
     fields: &[&syn::Ident],
     field_names: &[syn::LitStr],
 ) -> impl Into<TokenStream> {

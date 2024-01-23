@@ -5,7 +5,7 @@ use crate::prelude::*;
 use bitflags::bitflags;
 
 bitflags! {
-    #[esp_meta(true)]
+    #[esp_meta]
     #[repr(transparent)]
     #[derive(LoadSave, Clone, Debug, Default, Eq, PartialEq, Hash)]
     pub struct ObjectFlags: u32 {
@@ -18,7 +18,7 @@ bitflags! {
 }
 
 bitflags! {
-    #[esp_meta(true)]
+    #[esp_meta]
     #[repr(transparent)]
     #[derive(LoadSave, Clone, Debug, Default, Eq, PartialEq, Hash)]
     pub struct LandscapeFlags: u32 {
@@ -30,7 +30,7 @@ bitflags! {
 }
 
 bitflags! {
-  #[esp_meta(true)]
+  #[esp_meta]
     #[repr(transparent)]
     #[derive(LoadSave, Clone, Debug, Default, Eq, PartialEq, Hash)]
     pub struct CellFlags: u32 {

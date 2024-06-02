@@ -124,7 +124,7 @@ impl Save for Book {
 }
 
 #[cfg(feature = "egui")]
-impl crate::editor::Editor for Book {
+impl editor::Editor for Book {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         egui::Grid::new(format!("{}.Editor", name))
             .num_columns(2)

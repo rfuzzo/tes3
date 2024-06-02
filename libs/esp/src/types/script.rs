@@ -93,7 +93,7 @@ impl Save for Script {
 }
 
 #[cfg(feature = "egui")]
-impl crate::editor::Editor for Script {
+impl editor::Editor for Script {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         egui::Grid::new(name.clone()).num_columns(2).striped(true).show(ui, |ui| {
             ui.label(egui::RichText::new("flags").color(egui::Color32::LIGHT_BLUE));

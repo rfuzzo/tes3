@@ -26,7 +26,7 @@ nightly = ["esp?/nightly", "nif?/nightly"]
 serde = ["esp?/serde"]
 serde-zstd = ["esp?/zstd"]
 simd = ["esp?/simd", "nif?/simd"]
-egui = ["serde", "esp"]
+egui = ["serde", "esp?/egui"]
 
 # Lint Configuration
 

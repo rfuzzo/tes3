@@ -396,7 +396,7 @@ impl<const N: usize> Editor for [[u16; 16]; N] {
         None
     }
 }
-impl<const N: usize> Editor for [[u8; 9]; N] {
+impl<const N: usize> Editor for [[i8; 9]; N] {
     fn add_editor(&mut self, ui: &mut egui::Ui, name: String) {
         add_slice_editor(self, ui, name);
     }

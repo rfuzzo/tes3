@@ -52,3 +52,6 @@ egui = [
   "esp_macros/serde",
   "hashbrown/serde",
 ]
+
+[lints]
+workspace = true

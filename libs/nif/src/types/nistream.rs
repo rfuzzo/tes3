@@ -1,9 +1,8 @@
 // rust std imports
-use std::io::{self, Read, Seek, Write};
+use std::io::{Read, Seek, Write};
 use std::path::Path;
 
 // external imports
-use hashbrown::HashSet;
 use slotmap::{new_key_type, DenseSlotMap, Key};
 
 // internal imports
@@ -98,11 +97,11 @@ impl NiStream {
         // write version
         stream.save(&Self::VERSION)?;
 
-        // objects count
-        stream.save_as::<u32>(self.objects.len())?;
-
         // parse objects
         let objects: Vec<_> = self.objects().collect();
+
+        // objects count
+        stream.save_as::<u32>(objects.len())?;
 
         // resolve links
         for (key, _) in &objects {

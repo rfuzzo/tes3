@@ -165,7 +165,7 @@ fn get_repr(attributes: &[syn::Attribute]) -> syn::Ident {
 }
 
 ///////////////////////////////////////////////////////////
-/// egui macros
+// egui macros
 
 // todo: write a proper editor override
 #[doc(hidden)]

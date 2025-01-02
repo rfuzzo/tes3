@@ -8,3 +8,6 @@ pub use type_info::*;
 
 #[cfg(feature = "egui")]
 pub mod editor;
+
+mod object_info;
+pub use object_info::*;

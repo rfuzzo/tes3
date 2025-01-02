@@ -9,6 +9,7 @@ edition.workspace = true
 [workspace.package]
 version = "0.0.1"
 edition = "2021"
+rust-version = "1.80"
 authors = ["Greatness7 <Greatness7@gmail.com>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Greatness7/tes3"
@@ -101,6 +102,7 @@ ignored_unit_patterns = "allow"
 match_wildcard_for_single_variants = "allow"
 unsafe_derive_deserialize = "allow"
 multiple_crate_versions = "allow"
+wildcard_imports = "allow"
 #
 # Clippy Group: Nursery
 # https://rust-lang.github.io/rust-clippy/master/index.html#?groups=nursery
@@ -108,7 +110,7 @@ multiple_crate_versions = "allow"
 nursery = { level = "warn", priority = -1 }
 use_self = "allow"
 #
-# # Clippy Group: Restriction
+# Clippy Group: Restriction
 # https://rust-lang.github.io/rust-clippy/master/index.html#?groups=restriction
 #
 # restriction = { level = "warn", priority = -1 }

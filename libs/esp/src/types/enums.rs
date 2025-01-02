@@ -686,7 +686,7 @@ pub enum FilterSlot {
 
 #[esp_meta]
 #[repr(u8)]
-#[derive(LoadSave, Clone, Copy, Debug, Eq, PartialEq, Default)]
+#[derive(LoadSave, Clone, Copy, Debug, Eq, Hash, PartialEq, Default)]
 pub enum FilterType {
     #[default]
     None = b'0',

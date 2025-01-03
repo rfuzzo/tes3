@@ -122,3 +122,32 @@ impl Save for Book {
         Ok(())
     }
 }
+
+impl SqlInfo for Book {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("enchanting", "TEXT"), //FK
+            ("text", "TEXT"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("book_type", "TEXT"), //enum
+            ("skill", "TEXT"),     //enum
+            ("enchantment", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(enchanting) REFERENCES ENCH(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

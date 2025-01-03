@@ -67,3 +67,17 @@ impl Save for LandscapeTexture {
         Ok(())
     }
 }
+
+impl SqlInfo for LandscapeTexture {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("idx", "INTEGER"), ("file_name", "TEXT")]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

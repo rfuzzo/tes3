@@ -58,3 +58,17 @@ impl Save for StartScript {
         Ok(())
     }
 }
+
+impl SqlInfo for StartScript {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("script", "TEXT")]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

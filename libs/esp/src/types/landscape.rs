@@ -180,3 +180,21 @@ impl LandscapeFlags {
         self.intersects(Self::USES_VERTEX_HEIGHTS_AND_NORMALS | Self::USES_VERTEX_COLORS | Self::USES_TEXTURES)
     }
 }
+
+impl SqlInfo for Landscape {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("flags", "TEXT"),           //json
+            ("grid", "TEXT"),            //json
+            ("landscape_flags", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

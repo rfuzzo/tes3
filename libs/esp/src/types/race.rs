@@ -122,3 +122,22 @@ impl Save for Race {
         Ok(())
     }
 }
+
+impl SqlInfo for Race {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("spells", "TEXT"), //array
+            ("description", "TEXT"),
+            ("data", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

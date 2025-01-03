@@ -110,3 +110,24 @@ impl Save for BodypartData {
         Ok(())
     }
 }
+
+impl SqlInfo for Bodypart {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("race", "TEXT"),
+            ("mesh", "TEXT"),
+            ("part", "TEXT"), //enum
+            ("vampire", "INTEGER"),
+            ("flags", "TEXT"),
+            ("bodypart_type", "TEXT"), //enum
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(race) REFERENCES RACE(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

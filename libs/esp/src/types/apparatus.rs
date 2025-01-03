@@ -103,3 +103,26 @@ impl Save for Apparatus {
         Ok(())
     }
 }
+
+impl SqlInfo for Apparatus {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"),
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("apparatus_type", "TEXT"),
+            ("quality", "REAL"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

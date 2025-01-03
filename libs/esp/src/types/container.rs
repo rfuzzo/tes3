@@ -106,3 +106,24 @@ impl Save for Container {
         Ok(())
     }
 }
+
+impl SqlInfo for Container {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("encumbrance", "REAL"),
+            ("container_flags", "TEXT"), //json
+            ("inventory", "TEXT"),       //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

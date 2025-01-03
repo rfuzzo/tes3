@@ -120,3 +120,31 @@ impl Save for Clothing {
         Ok(())
     }
 }
+
+impl SqlInfo for Clothing {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("enchanting", "TEXT"),    //FK
+            ("biped_objects", "TEXT"), //json
+            ("clothing_type", "TEXT"), //enum
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("enchantment", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(enchanting) REFERENCES ENCH(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

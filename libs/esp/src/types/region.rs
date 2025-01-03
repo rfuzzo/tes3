@@ -156,3 +156,32 @@ impl Save for WeatherChances {
         Ok(())
     }
 }
+
+impl SqlInfo for Region {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("clear", "INTEGER"),
+            ("cloudy", "INTEGER"),
+            ("foggy", "INTEGER"),
+            ("overcast", "INTEGER"),
+            ("rain", "INTEGER"),
+            ("thunder", "INTEGER"),
+            ("ash", "INTEGER"),
+            ("blight", "INTEGER"),
+            ("snow", "INTEGER"),
+            ("blizzard", "INTEGER"),
+            ("sleep_creature", "TEXT"),
+            ("map_color", "TEXT"), //json
+            ("sounds", "TEXT"),    //aray
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

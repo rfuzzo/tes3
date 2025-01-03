@@ -113,3 +113,26 @@ impl Save for Alchemy {
         Ok(())
     }
 }
+
+impl SqlInfo for Alchemy {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"),
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("effects", "TEXT"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("data_flags", "TEXT"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

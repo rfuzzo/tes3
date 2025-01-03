@@ -1,0 +1,77 @@
+use crate::prelude::*;
+
+#[derive(Debug)]
+pub struct TableSchema {
+    pub name: &'static str,
+    pub columns: Vec<String>,
+    pub constraints: Vec<&'static str>,
+}
+
+pub trait SqlInfo {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)>;
+    fn table_constraints(&self) -> Vec<&'static str>;
+    fn table_name(&self) -> &'static str;
+
+    fn table_insert(&self) -> String {
+        let variable_names = self
+            .table_columns()
+            .iter()
+            .map(|(name, _)| name.to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let params = self
+            .table_columns()
+            .iter()
+            .enumerate()
+            .map(|(i, _)| format!("?{}", i + 3))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let str = format!(
+            "INSERT INTO {}
+            (
+            id, mod, {}
+            ) 
+            VALUES
+            (
+            ?1, ?2, {}
+            )",
+            self.table_name(),
+            variable_names,
+            params
+        );
+        str.to_string()
+    }
+
+    fn table_schema(&self) -> TableSchema {
+        TableSchema {
+            name: self.table_name(),
+            columns: self
+                .table_columns()
+                .iter()
+                .map(|(name, ty)| format!("{} {}", name, ty))
+                .collect::<Vec<_>>(),
+            constraints: self.table_constraints(),
+        }
+    }
+}
+
+impl SqlInfo for TES3Object {
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        delegate! {
+            match self {
+                inner => inner.table_columns()
+            }
+        }
+    }
+    fn table_constraints(&self) -> Vec<&'static str> {
+        delegate! {
+            match self {
+                inner => inner.table_constraints()
+            }
+        }
+    }
+}

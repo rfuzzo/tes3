@@ -173,3 +173,25 @@ impl Save for FactionReaction {
         Ok(())
     }
 }
+
+impl SqlInfo for Faction {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("rank_names", "TEXT"),         //array
+            ("reactions", "TEXT"),          //array
+            ("favored_attributes", "TEXT"), //json
+            ("requirements", "TEXT"),       //json
+            ("favored_skills", "TEXT"),     //json
+            ("flags", "TEXT"),              //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

@@ -102,3 +102,25 @@ impl Save for MiscItem {
         Ok(())
     }
 }
+
+impl SqlInfo for MiscItem {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("flags", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

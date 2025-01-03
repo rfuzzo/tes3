@@ -124,3 +124,24 @@ impl Save for PathGridPoint {
         Ok(())
     }
 }
+
+impl SqlInfo for PathGrid {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("cell", "TEXT"), //FK
+            ("grid", "TEXT"), //json
+            ("granularity", "INTEGER"),
+            ("point_count", "INTEGER"),
+            ("points", "TEXT"),      //array json
+            ("connections", "TEXT"), //array json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(cell) REFERENCES CELL(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

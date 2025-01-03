@@ -74,3 +74,22 @@ impl Save for Sound {
         Ok(())
     }
 }
+
+impl SqlInfo for Sound {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("sound_path", "TEXT"),
+            ("volume", "INTEGER"),
+            ("range_min", "INTEGER"),
+            ("range_max", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

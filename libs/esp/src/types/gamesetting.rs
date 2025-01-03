@@ -79,3 +79,17 @@ impl Save for GameSetting {
         Ok(())
     }
 }
+
+impl SqlInfo for GameSetting {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("value", "TEXT")]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

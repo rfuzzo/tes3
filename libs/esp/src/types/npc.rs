@@ -358,3 +358,46 @@ const fn pack_flags(npc_flags: NpcFlags, blood_type: u8) -> u32 {
     let blood_type = blood_type as u32;
     flags | ((blood_type & 0b111) << 10)
 }
+
+impl SqlInfo for Npc {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("inventory", "TEXT"),           //json
+            ("spells", "TEXT"),              //json
+            ("ai_data", "TEXT"),             //json
+            ("ai_packages", "TEXT"),         //json
+            ("travel_destinations", "TEXT"), //json
+            ("race", "TEXT"),                //FK
+            ("class", "TEXT"),               //FK
+            ("faction", "TEXT"),             //FK
+            ("head", "TEXT"),                //FK
+            ("hair", "TEXT"),                //FK
+            ("npc_flags", "TEXT"),           //json
+            ("blood_type", "INTEGER"),
+            ("data_level", "INTEGER"),
+            ("data_stats", "TEXT"), //json
+            ("data_disposition", "INTEGER"),
+            ("data_reputation", "INTEGER"),
+            ("data_rank", "INTEGER"),
+            ("data_gold", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(class) REFERENCES CLAS(id)",
+            "FOREIGN KEY(faction) REFERENCES FACT(id)",
+            "FOREIGN KEY(race) REFERENCES RACE(id)",
+            "FOREIGN KEY(head) REFERENCES BODY(id)",
+            "FOREIGN KEY(hair) REFERENCES BODY(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

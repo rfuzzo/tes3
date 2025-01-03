@@ -235,3 +235,40 @@ impl Reference {
         !self.temporary
     }
 }
+
+// impl SqlInfo for Reference {
+//     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+//         vec![
+//             ("mast_index", "INREGER"),
+//             ("refr_index", "INTEGER"),
+//             ("temporary", "INTEGER"), //bool
+//             ("translation", "TEXT"),  //json
+//             ("rotation", "TEXT"),     //json
+//             ("scale", "REAL"),
+//             ("moved_cell", "TEXT"), //json
+//             ("owner", "TEXT"),
+//             ("owner_global", "TEXT"),
+//             ("owner_faction", "TEXT"),
+//             ("owner_faction_rank", "INTEGER"),
+//             ("charge_left", "INTEGER"),
+//             ("health_left", "INTEGER"),
+//             ("object_count", "INTEGER"),
+//             ("destination", "TEXT"), //enum
+//             ("lock_level", "INTEGER"),
+//             ("key", "TEXT"),
+//             ("trap", "TEXT"),
+//             ("soul", "TEXT"),
+//             ("blocked", "INTEGER"),
+//             ("deleted", "INTEGER"), //bool
+//         ]
+//     }
+
+//     fn table_constraints(&self) -> Vec<&'static str> {
+//         vec![]
+//     }
+
+//     fn table_name(&self) -> &'static str {
+//         self.tag_str()
+//     }
+
+// }

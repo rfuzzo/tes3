@@ -76,3 +76,20 @@ impl Save for SoundGen {
         Ok(())
     }
 }
+
+impl SqlInfo for SoundGen {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("sound_gen_type", "TEXT"), ("creature", "TEXT"), ("sound", "TEXT")]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(creature) REFERENCES CREA(id)",
+            "FOREIGN KEY(sound) REFERENCES SOUN(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

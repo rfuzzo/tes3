@@ -103,3 +103,26 @@ impl Save for Probe {
         Ok(())
     }
 }
+
+impl SqlInfo for Probe {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("quality", "REAL"),
+            ("uses", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(name)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

@@ -171,3 +171,42 @@ impl Save for MagicEffect {
         Ok(())
     }
 }
+
+impl SqlInfo for MagicEffect {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("effect_id", "TEXT"), //enum
+            ("icon", "TEXT"),
+            ("texture", "TEXT"),    //FK?
+            ("bolt_sound", "TEXT"), //FK
+            ("cast_sound", "TEXT"), //FK
+            ("hit_sound", "TEXT"),  //FK
+            ("area_sound", "TEXT"), //FK
+            ("cast_visual", "TEXT"),
+            ("bolt_visual", "TEXT"),
+            ("hit_visual", "TEXT"),
+            ("area_visual", "TEXT"),
+            ("description", "TEXT"),
+            ("school", "TEXT"), //enum
+            ("base_cost", "REAL"),
+            ("flags", "TEXT"), //json
+            ("color", "TEXT"), //json todo color
+            ("speed", "REAL"),
+            ("size", "REAL"),
+            ("size_cap", "REAL"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(bolt_sound) REFERENCES SOUN(id)",
+            "FOREIGN KEY(cast_sound) REFERENCES SOUN(id)",
+            "FOREIGN KEY(hit_sound) REFERENCES SOUN(id)",
+            "FOREIGN KEY(area_sound) REFERENCES SOUN(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

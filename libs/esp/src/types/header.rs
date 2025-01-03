@@ -1,6 +1,7 @@
 // rust std imports
 use std::io::Read;
 use std::path::Path;
+use std::vec;
 
 // internal imports
 use crate::prelude::*;
@@ -100,5 +101,26 @@ impl Header {
         let mut buffer = vec![0; size + 4];
         file.read_exact(&mut buffer)?;
         Reader::new(&buffer).load()
+    }
+}
+
+impl SqlInfo for Header {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("version", "REAL"),
+            ("file_type", "TEXT"),
+            ("author", "TEXT"),
+            ("description", "TEXT"),
+            ("num_objects", "INTEGER"),
+            ("masters", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
     }
 }

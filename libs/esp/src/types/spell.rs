@@ -86,3 +86,23 @@ impl Save for Spell {
         Ok(())
     }
 }
+
+impl SqlInfo for Spell {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("effects", "TEXT"),    //array
+            ("spell_type", "TEXT"), //enum
+            ("cost", "INTEGER"),
+            ("flags", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

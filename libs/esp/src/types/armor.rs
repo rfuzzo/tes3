@@ -122,3 +122,33 @@ impl Save for Armor {
         Ok(())
     }
 }
+
+impl SqlInfo for Armor {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"),
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("enchanting", "TEXT"),
+            ("biped_objects", "TEXT"),
+            ("armor_type", "TEXT"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("health", "INTEGER"),
+            ("enchantment", "INTEGER"),
+            ("armor_rating", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(enchanting) REFERENCES ENCH(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

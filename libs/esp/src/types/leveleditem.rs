@@ -103,3 +103,21 @@ fn err() -> io::Error {
         "PC Level provided without a corresponding item id",
     )
 }
+
+impl SqlInfo for LeveledItem {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("leveled_item_flags", "TEXT"), //json
+            ("chance_none", "INTEGER"),
+            ("items", "TEXT"), //array
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

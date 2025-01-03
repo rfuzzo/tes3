@@ -58,3 +58,17 @@ impl Save for Static {
         Ok(())
     }
 }
+
+impl SqlInfo for Static {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("mesh", "TEXT")]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

@@ -1,3 +1,5 @@
+use std::vec;
+
 // internal imports
 use crate::prelude::*;
 
@@ -61,5 +63,19 @@ impl Save for Dialogue {
             stream.save(&0u32)?;
         }
         Ok(())
+    }
+}
+
+impl SqlInfo for Dialogue {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("dialogue_type", "TEXT")] //enum
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
     }
 }

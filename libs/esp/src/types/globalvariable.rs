@@ -80,6 +80,20 @@ impl Save for GlobalVariable {
     }
 }
 
+impl SqlInfo for GlobalVariable {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("value", "TEXT")] //json
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}
+
 impl GlobalValue {
     #[allow(clippy::cast_possible_truncation)]
     pub const fn from_f32(t: GlobalType, v: f32) -> Self {

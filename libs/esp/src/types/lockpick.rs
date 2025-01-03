@@ -103,3 +103,26 @@ impl Save for Lockpick {
         Ok(())
     }
 }
+
+impl SqlInfo for Lockpick {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("quality", "REAL"),
+            ("uses", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES scripts(name)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

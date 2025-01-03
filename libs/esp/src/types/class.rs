@@ -96,3 +96,17 @@ impl Save for Class {
         Ok(())
     }
 }
+
+impl SqlInfo for Class {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("name", "TEXT"), ("description", "TEXT"), ("data", "TEXT")]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

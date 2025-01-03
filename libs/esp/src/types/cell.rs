@@ -266,3 +266,26 @@ const fn pack(packed_indices: (u32, u32)) -> u32 {
     debug_assert!(refr_index <= 0xFFFFFF);
     refr_index | (mast_index << 24)
 }
+
+impl SqlInfo for Cell {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("data_flags", "TEXT"),
+            ("grid", "TEXT"),
+            ("region", "TEXT"),    //FK
+            ("map_color", "TEXT"), //json
+            ("water_height", "REAL"),
+            ("atmosphere_data", "TEXT"), //json
+            ("cell_references", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(region) REFERENCES REGN(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

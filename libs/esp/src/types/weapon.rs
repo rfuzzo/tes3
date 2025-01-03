@@ -122,3 +122,40 @@ impl Save for Weapon {
         Ok(())
     }
 }
+
+impl SqlInfo for Weapon {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("enchanting", "TEXT"), //FK
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("weapon_type", "TEXT"), //json
+            ("health", "INTEGER"),
+            ("speed", "REAL"),
+            ("reach", "REAL"),
+            ("enchantment", "INTEGER"),
+            ("chop_min", "INTEGER"),
+            ("chop_max", "INTEGER"),
+            ("slash_min", "INTEGER"),
+            ("slash_max", "INTEGER"),
+            ("thrust_min", "INTEGER"),
+            ("thrust_max", "INTEGER"),
+            ("flags", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(enchanting) REFERENCES ENCH(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

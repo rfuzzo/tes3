@@ -114,3 +114,32 @@ impl Save for Light {
         Ok(())
     }
 }
+
+impl SqlInfo for Light {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("icon", "TEXT"),
+            ("sound", "TEXT"), //FK
+            ("weight", "REAL"),
+            ("value", "INTEGER"),
+            ("time", "INTEGER"),
+            ("radius", "INTEGER"),
+            ("color", "BLOB"), // todo color
+            ("flags", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(sound) REFERENCES SOUN(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

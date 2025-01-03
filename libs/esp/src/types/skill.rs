@@ -77,3 +77,23 @@ impl Save for Skill {
         Ok(())
     }
 }
+
+impl SqlInfo for Skill {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("skill_id", "TEXT"), //enum
+            ("governing_attribute", "INTEGER"),
+            ("specialization", "INTEGER"),
+            ("actions", "TEXT"), //json
+            ("description", "TEXT"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

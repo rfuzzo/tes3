@@ -343,3 +343,45 @@ fn err() -> io::Error {
         "Info filter value was provided without a corresponding filter definition.",
     )
 }
+
+impl SqlInfo for DialogueInfo {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("prev_id", "TEXT"),       //FK
+            ("next_id", "TEXT"),       //FK
+            ("dialogue_type", "TEXT"), //json
+            ("disposition", "INTEGER"),
+            ("speaker_rank", "INTEGER"),
+            ("speaker_sex", "TEXT"), //enum
+            ("player_rank", "INTEGER"),
+            ("speaker_id", "TEXT"),      //FK?
+            ("speaker_race", "TEXT"),    //FK
+            ("speaker_class", "TEXT"),   //FK
+            ("speaker_faction", "TEXT"), //FK
+            ("speaker_cell", "TEXT"),    //FK
+            ("player_faction", "TEXT"),  //FK
+            ("sound_path", "TEXT"),
+            ("text", "TEXT"),
+            ("quest_state", "TEXT"), //enum
+            ("filters", "TEXT"),     //json
+            ("script_text", "TEXT"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(prev_id) REFERENCES DIAL(id)",
+            "FOREIGN KEY(next_id) REFERENCES DIAL(id)",
+            "FOREIGN KEY(speaker_id) REFERENCES NPC_(id)",
+            "FOREIGN KEY(speaker_race) REFERENCES RACE(id)",
+            "FOREIGN KEY(speaker_class) REFERENCES CLAS(id)",
+            "FOREIGN KEY(speaker_faction) REFERENCES FACT(id)",
+            "FOREIGN KEY(speaker_cell) REFERENCES CELL(id)",
+            "FOREIGN KEY(player_faction) REFERENCES FACT(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

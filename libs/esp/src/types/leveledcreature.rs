@@ -103,3 +103,21 @@ fn err() -> io::Error {
         "PC Level provided without a corresponding creature id",
     )
 }
+
+impl SqlInfo for LeveledCreature {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("leveled_creature_flags", "TEXT"), //enum
+            ("chance_none", "INTEGER"),
+            ("creatures", "TEXT"), //array
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

@@ -76,3 +76,21 @@ impl Save for Activator {
         Ok(())
     }
 }
+
+impl SqlInfo for Activator {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            (name_of!(name in Activator), "TEXT"),
+            (name_of!(script in Activator), "TEXT"),
+            (name_of!(mesh in Activator), "TEXT"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

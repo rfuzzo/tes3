@@ -259,3 +259,54 @@ const fn pack_flags(npc_flags: CreatureFlags, blood_type: u8) -> u32 {
     let blood_type = blood_type as u32;
     flags | ((blood_type & 0b111) << 10)
 }
+
+impl SqlInfo for Creature {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"), //FK
+            ("mesh", "TEXT"),
+            ("inventory", "TEXT"),           //json
+            ("spells", "TEXT"),              //json
+            ("ai_data", "TEXT"),             //json
+            ("ai_packages", "TEXT"),         //json
+            ("travel_destinations", "TEXT"), //json
+            ("sound", "TEXT"),
+            ("scale", "REAL"),
+            ("creature_flags", "TEXT"), //json
+            ("blood_type", "INTEGER"),
+            ("creature_type", "TEXT"), //json
+            ("level", "INTEGER"),
+            ("strength", "INTEGER"),
+            ("intelligence", "INTEGER"),
+            ("willpower", "INTEGER"),
+            ("agility", "INTEGER"),
+            ("speed", "INTEGER"),
+            ("endurance", "INTEGER"),
+            ("personality", "INTEGER"),
+            ("luck", "INTEGER"),
+            ("health", "INTEGER"),
+            ("magicka", "INTEGER"),
+            ("fatigue", "INTEGER"),
+            ("soul", "INTEGER"),
+            ("combat", "INTEGER"),
+            ("magic", "INTEGER"),
+            ("stealth", "INTEGER"),
+            ("attack1_min", "INTEGER"),
+            ("attack1_max", "INTEGER"),
+            ("attack2_min", "INTEGER"),
+            ("attack2_max", "INTEGER"),
+            ("attack3_min", "INTEGER"),
+            ("attack3_max", "INTEGER"),
+            ("gold", "INTEGER"),
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

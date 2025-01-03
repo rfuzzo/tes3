@@ -91,3 +91,18 @@ impl Save for Script {
         Ok(())
     }
 }
+
+impl SqlInfo for Script {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![("text", "TEXT")]
+        //todo
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

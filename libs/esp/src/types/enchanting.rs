@@ -78,3 +78,23 @@ impl Save for Enchanting {
         Ok(())
     }
 }
+
+impl SqlInfo for Enchanting {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("effects", "TEXT"),      //json
+            ("enchant_type", "TEXT"), //enum
+            ("cost", "INTEGER"),
+            ("max_charge", "INTEGER"),
+            ("flags", "TEXT"), //json
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

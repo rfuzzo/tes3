@@ -94,3 +94,26 @@ impl Save for Door {
         Ok(())
     }
 }
+
+impl SqlInfo for Door {
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("name", "TEXT"),
+            ("script", "TEXT"),
+            ("mesh", "TEXT"),
+            ("open_sound", "TEXT"),  //FK
+            ("close_sound", "TEXT"), //FK
+        ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![
+            "FOREIGN KEY(open_sound) REFERENCES SOUN(id)",
+            "FOREIGN KEY(close_sound) REFERENCES SOUN(id)",
+        ]
+    }
+
+    fn table_name(&self) -> &'static str {
+        self.tag_str()
+    }
+}

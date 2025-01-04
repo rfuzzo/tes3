@@ -135,7 +135,7 @@ impl SqlInfo for Bodypart {
         db.execute(
             self.table_insert_text().as_str(),
             params![
-                self.editor_id(),
+                self.editor_id().to_lowercase(),
                 name,
                 self.race,
                 self.mesh,

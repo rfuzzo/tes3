@@ -219,10 +219,10 @@ impl SqlInfo for MagicEffect {
                 //as_enum!(self.effect_id),
                 self.icon,
                 self.texture,
-                as_option!(self.bolt_sound),
-                as_option!(self.cast_sound),
-                as_option!(self.hit_sound),
-                as_option!(self.area_sound),
+                as_option!(self.bolt_sound.to_lowercase()), //thanks todd
+                as_option!(self.cast_sound.to_lowercase()), //thanks todd
+                as_option!(self.hit_sound.to_lowercase()),  //thanks todd
+                as_option!(self.area_sound.to_lowercase()), //thanks todd
                 self.cast_visual,
                 self.bolt_visual,
                 self.hit_visual,

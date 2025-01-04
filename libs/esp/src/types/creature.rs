@@ -305,7 +305,7 @@ impl SqlInfo for Creature {
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(script) REFERENCES SCPT(id)",
-            "FOREIGN KEY(sound) REFERENCES SNDG(id)",
+            //"FOREIGN KEY(sound) REFERENCES SNDG(id)", //todo cycle
         ]
     }
 

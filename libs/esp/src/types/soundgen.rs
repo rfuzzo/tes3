@@ -88,7 +88,7 @@ impl SqlInfo for SoundGen {
 
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
-            "FOREIGN KEY(creature) REFERENCES CREA(id) DEFERRABLE INITIALLY DEFERRED",
+            "FOREIGN KEY(creature) REFERENCES CREA(id)", //DEFERRABLE INITIALLY DEFERRED
             "FOREIGN KEY(sound) REFERENCES SOUN(id)",
         ]
     }

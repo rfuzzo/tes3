@@ -393,7 +393,7 @@ impl SqlInfo for Npc {
             "FOREIGN KEY(faction) REFERENCES FACT(id)",
             "FOREIGN KEY(race) REFERENCES RACE(id)",
             "FOREIGN KEY(head) REFERENCES BODY(id)",
-            //"FOREIGN KEY(hair) REFERENCES BODY(id)",
+            "FOREIGN KEY(hair) REFERENCES BODY(id)",
         ]
     }
 
@@ -418,8 +418,8 @@ impl SqlInfo for Npc {
                 as_option!(self.race),
                 as_option!(self.class),
                 as_option!(self.faction),
-                as_option!(self.head),
-                as_option!(self.hair),
+                as_option!(self.head.to_lowercase()), //thanks todd
+                as_option!(self.hair.to_lowercase()), //thanks todd
                 as_json!(self.npc_flags),
                 self.blood_type,
                 self.data.level,

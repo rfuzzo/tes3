@@ -129,19 +129,37 @@ impl SqlInfo for PathGrid {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("cell", "TEXT"), //FK
-            ("grid", "TEXT"), //json
+            ("grid", "TEXT"), //format
             ("granularity", "INTEGER"),
             ("point_count", "INTEGER"),
-            ("points", "TEXT"),      //array json
-            ("connections", "TEXT"), //array json
+            ("points", "TEXT"),      //array
+            ("connections", "TEXT"), //array
         ]
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(cell) REFERENCES CELL(id)"]
+        vec![
+        //"FOREIGN KEY(cell) REFERENCES CELL(id)"
+        ]
     }
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_option!(self.cell),
+                as_sql!(self.data.grid),
+                self.data.granularity,
+                self.data.point_count,
+                as_json!(self.points),
+                as_json!(self.connections),
+            ],
+        )
     }
 }

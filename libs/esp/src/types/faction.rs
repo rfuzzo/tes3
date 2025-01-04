@@ -180,10 +180,10 @@ impl SqlInfo for Faction {
             ("name", "TEXT"),
             ("rank_names", "TEXT"),         //array
             ("reactions", "TEXT"),          //array
-            ("favored_attributes", "TEXT"), //json
-            ("requirements", "TEXT"),       //json
-            ("favored_skills", "TEXT"),     //json
-            ("flags", "TEXT"),              //json
+            ("favored_attributes", "TEXT"), //enum
+            ("requirements", "TEXT"),       //array
+            ("favored_skills", "TEXT"),     //array
+            ("flags", "TEXT"),              //flags
         ]
     }
 
@@ -194,4 +194,22 @@ impl SqlInfo for Faction {
     fn table_name(&self) -> &'static str {
         self.tag_str()
     }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_json!(self.rank_names),
+                as_json!(self.reactions),
+                as_json!(self.data.favored_attributes),
+                as_json!(self.data.requirements),
+                as_json!(self.data.favored_skills),
+                as_json!(self.data.flags)
+            ],
+        )
+    }
 }
+impl Faction {}

@@ -105,4 +105,8 @@ impl SqlInfo for Script {
     fn table_name(&self) -> &'static str {
         self.tag_str()
     }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(self.table_insert_text().as_str(), params![self.editor_id(), name, self.text])
+    }
 }

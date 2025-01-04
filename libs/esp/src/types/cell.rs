@@ -271,13 +271,13 @@ impl SqlInfo for Cell {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("data_flags", "TEXT"),
-            ("grid", "TEXT"),
-            ("region", "TEXT"),    //FK
-            ("map_color", "TEXT"), //json
+            ("data_flags", "TEXT"), //enum
+            ("grid", "TEXT"),       //format
+            ("region", "TEXT"),     //FK
+            ("map_color", "TEXT"),  //json
             ("water_height", "REAL"),
             ("atmosphere_data", "TEXT"), //json
-            ("cell_references", "TEXT"), //json
+            ("cell_references", "TEXT"), //custom json
         ]
     }
 
@@ -287,5 +287,25 @@ impl SqlInfo for Cell {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        let references = serde_json::to_string_pretty(&self.references.values().collect::<Vec<_>>()).unwrap();
+
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_json!(self.data.flags),
+                as_sql!(self.data.grid),
+                self.region,
+                as_json!(self.map_color),
+                self.water_height,
+                as_json!(self.atmosphere_data),
+                references
+            ],
+        )
     }
 }

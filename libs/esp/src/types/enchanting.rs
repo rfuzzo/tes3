@@ -86,7 +86,7 @@ impl SqlInfo for Enchanting {
             ("enchant_type", "TEXT"), //enum
             ("cost", "INTEGER"),
             ("max_charge", "INTEGER"),
-            ("flags", "TEXT"), //json
+            ("flags", "TEXT"), //flags
         ]
     }
 
@@ -96,5 +96,20 @@ impl SqlInfo for Enchanting {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_json!(self.effects),
+                as_enum!(self.data.enchant_type),
+                self.data.cost,
+                self.data.max_charge,
+                as_json!(self.data.flags),
+            ],
+        )
     }
 }

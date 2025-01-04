@@ -22,7 +22,9 @@ pub(crate) mod prelude {
     pub use cow_utils::CowUtils;
     pub use derive_more::{Deref, DerefMut, From, Into};
     pub use hashbrown::{HashMap, HashSet};
-    pub use nameof::name_of;
+    pub use rusqlite::params;
+    pub use rusqlite::Connection;
+    pub use rusqlite::ToSql;
     pub use smart_default::SmartDefault;
     pub use std::io;
 

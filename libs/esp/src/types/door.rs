@@ -99,7 +99,7 @@ impl SqlInfo for Door {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"),
+            ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("open_sound", "TEXT"),  //FK
             ("close_sound", "TEXT"), //FK
@@ -115,5 +115,20 @@ impl SqlInfo for Door {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                as_option!(self.open_sound),
+                as_option!(self.close_sound),
+            ],
+        )
     }
 }

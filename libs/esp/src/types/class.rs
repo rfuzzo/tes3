@@ -99,7 +99,25 @@ impl Save for Class {
 
 impl SqlInfo for Class {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![("name", "TEXT"), ("description", "TEXT"), ("data", "TEXT")]
+        vec![
+            ("name", "TEXT"),
+            ("description", "TEXT"),
+            ("attribute1", "TEXT"),     //enum
+            ("attribute2", "TEXT"),     //enum
+            ("specialization", "TEXT"), //enum
+            ("minor1", "TEXT"),         //enum
+            ("major1", "TEXT"),         //enum
+            ("minor2", "TEXT"),         //enum
+            ("major2", "TEXT"),         //enum
+            ("minor3", "TEXT"),         //enum
+            ("major3", "TEXT"),         //enum
+            ("minor4", "TEXT"),         //enum
+            ("major4", "TEXT"),         //enum
+            ("minor5", "TEXT"),         //enum
+            ("major5", "TEXT"),         //enum
+            ("data_flags", "TEXT"),     //flags
+            ("services", "TEXT"),       //flags
+        ]
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
@@ -108,5 +126,32 @@ impl SqlInfo for Class {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                self.description,
+                as_enum!(self.data.attribute1),
+                as_enum!(self.data.attribute2),
+                as_enum!(self.data.specialization),
+                as_enum!(self.data.minor1),
+                as_enum!(self.data.major1),
+                as_enum!(self.data.minor2),
+                as_enum!(self.data.major2),
+                as_enum!(self.data.minor3),
+                as_enum!(self.data.major3),
+                as_enum!(self.data.minor4),
+                as_enum!(self.data.major4),
+                as_enum!(self.data.minor5),
+                as_enum!(self.data.major5),
+                as_json!(self.data.flags),
+                as_json!(self.data.services),
+            ],
+        )
     }
 }

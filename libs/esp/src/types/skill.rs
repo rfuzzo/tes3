@@ -84,7 +84,7 @@ impl SqlInfo for Skill {
             ("skill_id", "TEXT"), //enum
             ("governing_attribute", "INTEGER"),
             ("specialization", "INTEGER"),
-            ("actions", "TEXT"), //json
+            ("actions", "TEXT"), //array
             ("description", "TEXT"),
         ]
     }
@@ -95,5 +95,20 @@ impl SqlInfo for Skill {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_enum!(self.skill_id),
+                self.data.governing_attribute,
+                self.data.specialization,
+                as_json!(self.data.actions),
+                self.description,
+            ],
+        )
     }
 }

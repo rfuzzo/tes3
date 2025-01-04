@@ -118,7 +118,7 @@ impl SqlInfo for Bodypart {
             ("mesh", "TEXT"),
             ("part", "TEXT"), //enum
             ("vampire", "INTEGER"),
-            ("flags", "TEXT"),
+            ("flags", "TEXT"),         //flags
             ("bodypart_type", "TEXT"), //enum
         ]
     }
@@ -129,5 +129,21 @@ impl SqlInfo for Bodypart {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.race,
+                self.mesh,
+                as_enum!(self.data.part),
+                self.data.vampire,
+                as_json!(self.flags),
+                as_enum!(self.data.bodypart_type)
+            ],
+        )
     }
 }

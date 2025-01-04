@@ -107,7 +107,7 @@ fn err() -> io::Error {
 impl SqlInfo for LeveledCreature {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("leveled_creature_flags", "TEXT"), //enum
+            ("leveled_creature_flags", "TEXT"), //flags
             ("chance_none", "INTEGER"),
             ("creatures", "TEXT"), //array
         ]
@@ -119,5 +119,18 @@ impl SqlInfo for LeveledCreature {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_json!(self.leveled_creature_flags),
+                self.chance_none,
+                as_json!(self.creatures),
+            ],
+        )
     }
 }

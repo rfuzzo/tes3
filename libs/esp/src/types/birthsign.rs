@@ -93,7 +93,7 @@ impl SqlInfo for Birthsign {
             ("name", "TEXT"),
             ("texture", "TEXT"),
             ("description", "TEXT"),
-            ("spells", "TEXT"), // json
+            ("spells", "TEXT"), // array
         ]
     }
 
@@ -103,5 +103,19 @@ impl SqlInfo for Birthsign {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                self.texture,
+                self.description,
+                as_json!(self.spells)
+            ],
+        )
     }
 }

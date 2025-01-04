@@ -82,7 +82,9 @@ impl Save for GameSetting {
 
 impl SqlInfo for GameSetting {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![("value", "TEXT")]
+        vec![
+            ("value", "TEXT"), //json
+        ]
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
@@ -91,5 +93,12 @@ impl SqlInfo for GameSetting {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![self.editor_id(), name, as_json!(self.value)],
+        )
     }
 }

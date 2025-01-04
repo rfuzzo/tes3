@@ -127,12 +127,12 @@ impl SqlInfo for Armor {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"),
+            ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("enchanting", "TEXT"),
-            ("biped_objects", "TEXT"),
-            ("armor_type", "TEXT"),
+            ("enchanting", "TEXT"),    //FK
+            ("biped_objects", "TEXT"), //array
+            ("armor_type", "TEXT"),    //enum
             ("weight", "REAL"),
             ("value", "INTEGER"),
             ("health", "INTEGER"),
@@ -150,5 +150,27 @@ impl SqlInfo for Armor {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                as_option!(self.enchanting),
+                as_json!(self.biped_objects),
+                as_enum!(self.data.armor_type),
+                self.data.weight,
+                self.data.value,
+                self.data.health,
+                self.data.enchantment,
+                self.data.armor_rating,
+            ],
+        )
     }
 }

@@ -175,7 +175,7 @@ impl Save for MagicEffect {
 impl SqlInfo for MagicEffect {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("effect_id", "TEXT"), //enum
+            //("effect_id", "TEXT"), //enum
             ("icon", "TEXT"),
             ("texture", "TEXT"),    //FK?
             ("bolt_sound", "TEXT"), //FK
@@ -189,8 +189,8 @@ impl SqlInfo for MagicEffect {
             ("description", "TEXT"),
             ("school", "TEXT"), //enum
             ("base_cost", "REAL"),
-            ("flags", "TEXT"), //json
-            ("color", "TEXT"), //json todo color
+            ("data_flags", "TEXT"), //flags
+            ("color", "TEXT"),      //json todo color
             ("speed", "REAL"),
             ("size", "REAL"),
             ("size_cap", "REAL"),
@@ -208,5 +208,34 @@ impl SqlInfo for MagicEffect {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                //as_enum!(self.effect_id),
+                self.icon,
+                self.texture,
+                as_option!(self.bolt_sound),
+                as_option!(self.cast_sound),
+                as_option!(self.hit_sound),
+                as_option!(self.area_sound),
+                self.cast_visual,
+                self.bolt_visual,
+                self.hit_visual,
+                self.area_visual,
+                self.description,
+                as_enum!(self.data.school),
+                self.data.base_cost,
+                as_json!(self.data.flags),
+                as_json!(self.data.color),
+                self.data.speed,
+                self.data.size,
+                self.data.size_cap,
+            ],
+        )
     }
 }

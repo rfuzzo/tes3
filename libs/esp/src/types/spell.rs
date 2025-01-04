@@ -94,7 +94,7 @@ impl SqlInfo for Spell {
             ("effects", "TEXT"),    //array
             ("spell_type", "TEXT"), //enum
             ("cost", "INTEGER"),
-            ("flags", "TEXT"), //json
+            ("flags", "TEXT"), //flags
         ]
     }
 
@@ -104,5 +104,20 @@ impl SqlInfo for Spell {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_json!(self.effects),
+                as_enum!(self.data.spell_type),
+                self.data.cost,
+                as_json!(self.data.flags),
+            ],
+        )
     }
 }

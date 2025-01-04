@@ -27,7 +27,8 @@ smart-default = "^0.7"
 base64-simd = { version = "^0.8", optional = true }
 serde = { version = "^1.0", features = ["derive"], optional = true }
 zstd = { version = "^0.13", optional = true }
-nameof = "^1.0"
+rusqlite = "0.32.0"
+serde_json = "1.0"
 
 [dev-dependencies]
 tempfile = "^3.8"

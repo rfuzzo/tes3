@@ -128,7 +128,7 @@ impl SqlInfo for Light {
             ("time", "INTEGER"),
             ("radius", "INTEGER"),
             ("color", "BLOB"), // todo color
-            ("flags", "TEXT"), //json
+            ("flags", "TEXT"), //flags
         ]
     }
 
@@ -141,5 +141,26 @@ impl SqlInfo for Light {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                as_option!(self.sound),
+                self.data.weight,
+                self.data.value,
+                self.data.time,
+                self.data.radius,
+                self.data.color,
+                as_json!(self.flags),
+            ],
+        )
     }
 }

@@ -349,12 +349,12 @@ impl SqlInfo for DialogueInfo {
         vec![
             ("prev_id", "TEXT"),       //FK
             ("next_id", "TEXT"),       //FK
-            ("dialogue_type", "TEXT"), //json
+            ("dialogue_type", "TEXT"), //enum
             ("disposition", "INTEGER"),
             ("speaker_rank", "INTEGER"),
             ("speaker_sex", "TEXT"), //enum
             ("player_rank", "INTEGER"),
-            ("speaker_id", "TEXT"),      //FK?
+            ("speaker_id", "TEXT"),      //FK
             ("speaker_race", "TEXT"),    //FK
             ("speaker_class", "TEXT"),   //FK
             ("speaker_faction", "TEXT"), //FK
@@ -363,25 +363,53 @@ impl SqlInfo for DialogueInfo {
             ("sound_path", "TEXT"),
             ("text", "TEXT"),
             ("quest_state", "TEXT"), //enum
-            ("filters", "TEXT"),     //json
+            ("filters", "TEXT"),     //array
             ("script_text", "TEXT"),
         ]
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
-            "FOREIGN KEY(prev_id) REFERENCES DIAL(id)",
-            "FOREIGN KEY(next_id) REFERENCES DIAL(id)",
+            //"FOREIGN KEY(prev_id) REFERENCES DIAL(id)",
+            //"FOREIGN KEY(next_id) REFERENCES DIAL(id)",
             "FOREIGN KEY(speaker_id) REFERENCES NPC_(id)",
             "FOREIGN KEY(speaker_race) REFERENCES RACE(id)",
             "FOREIGN KEY(speaker_class) REFERENCES CLAS(id)",
             "FOREIGN KEY(speaker_faction) REFERENCES FACT(id)",
-            "FOREIGN KEY(speaker_cell) REFERENCES CELL(id)",
+            //"FOREIGN KEY(speaker_cell) REFERENCES CELL(id)",
             "FOREIGN KEY(player_faction) REFERENCES FACT(id)",
         ]
     }
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_option!(self.prev_id),
+                as_option!(self.next_id),
+                as_enum!(self.data.dialogue_type),
+                self.data.disposition,
+                self.data.speaker_rank,
+                as_enum!(self.data.speaker_sex),
+                self.data.player_rank,
+                as_option!(self.speaker_id),
+                as_option!(self.speaker_race),
+                as_option!(self.speaker_class),
+                as_option!(self.speaker_faction),
+                as_option!(self.speaker_cell),
+                as_option!(self.player_faction),
+                self.sound_path,
+                self.text,
+                as_enum!(self.quest_state),
+                as_json!(self.filters),
+                self.script_text,
+            ],
+        )
     }
 }

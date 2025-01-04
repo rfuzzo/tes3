@@ -129,7 +129,31 @@ impl SqlInfo for Race {
             ("name", "TEXT"),
             ("spells", "TEXT"), //array
             ("description", "TEXT"),
-            ("data", "TEXT"), //json
+            ("skill_0", "TEXT"), //enum
+            ("bonus_0", "INTEGER"),
+            ("skill_1", "TEXT"), //enum
+            ("bonus_1", "INTEGER"),
+            ("skill_2", "TEXT"), //enum
+            ("bonus_2", "INTEGER"),
+            ("skill_3", "TEXT"), //enum
+            ("bonus_3", "INTEGER"),
+            ("skill_4", "TEXT"), //enum
+            ("bonus_4", "INTEGER"),
+            ("skill_5", "TEXT"), //enum
+            ("bonus_5", "INTEGER"),
+            ("skill_6", "TEXT"), //enum
+            ("bonus_6", "INTEGER"),
+            ("strength", "TEXT"),     //format
+            ("intelligence", "TEXT"), //format
+            ("willpower", "TEXT"),    //format
+            ("agility", "TEXT"),      //format
+            ("speed", "TEXT"),        //format
+            ("endurance", "TEXT"),    //format
+            ("personality", "TEXT"),  //format
+            ("luck", "TEXT"),         //format
+            ("height", "TEXT"),       //format
+            ("weight", "TEXT"),       //format
+            ("data_flags", "TEXT"),   //flags
         ]
     }
 
@@ -139,5 +163,43 @@ impl SqlInfo for Race {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_json!(self.spells),
+                self.description,
+                as_enum!(self.data.skill_bonuses.skill_0),
+                self.data.skill_bonuses.bonus_0,
+                as_enum!(self.data.skill_bonuses.skill_1),
+                self.data.skill_bonuses.bonus_1,
+                as_enum!(self.data.skill_bonuses.skill_2),
+                self.data.skill_bonuses.bonus_2,
+                as_enum!(self.data.skill_bonuses.skill_3),
+                self.data.skill_bonuses.bonus_3,
+                as_enum!(self.data.skill_bonuses.skill_4),
+                self.data.skill_bonuses.bonus_4,
+                as_enum!(self.data.skill_bonuses.skill_5),
+                self.data.skill_bonuses.bonus_5,
+                as_enum!(self.data.skill_bonuses.skill_6),
+                self.data.skill_bonuses.bonus_6,
+                as_sql!(self.data.strength),
+                as_sql!(self.data.intelligence),
+                as_sql!(self.data.willpower),
+                as_sql!(self.data.agility),
+                as_sql!(self.data.speed),
+                as_sql!(self.data.endurance),
+                as_sql!(self.data.personality),
+                as_sql!(self.data.luck),
+                as_sql!(self.data.height),
+                as_sql!(self.data.weight),
+                as_json!(self.data.flags),
+            ],
+        )
     }
 }

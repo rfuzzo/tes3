@@ -365,17 +365,17 @@ impl SqlInfo for Npc {
             ("name", "TEXT"),
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
-            ("inventory", "TEXT"),           //json
-            ("spells", "TEXT"),              //json
+            ("inventory", "TEXT"),           //array
+            ("spells", "TEXT"),              //array
             ("ai_data", "TEXT"),             //json
-            ("ai_packages", "TEXT"),         //json
-            ("travel_destinations", "TEXT"), //json
+            ("ai_packages", "TEXT"),         //array
+            ("travel_destinations", "TEXT"), //array
             ("race", "TEXT"),                //FK
             ("class", "TEXT"),               //FK
             ("faction", "TEXT"),             //FK
             ("head", "TEXT"),                //FK
             ("hair", "TEXT"),                //FK
-            ("npc_flags", "TEXT"),           //json
+            ("npc_flags", "TEXT"),           //flags
             ("blood_type", "INTEGER"),
             ("data_level", "INTEGER"),
             ("data_stats", "TEXT"), //json
@@ -393,11 +393,42 @@ impl SqlInfo for Npc {
             "FOREIGN KEY(faction) REFERENCES FACT(id)",
             "FOREIGN KEY(race) REFERENCES RACE(id)",
             "FOREIGN KEY(head) REFERENCES BODY(id)",
-            "FOREIGN KEY(hair) REFERENCES BODY(id)",
+            //"FOREIGN KEY(hair) REFERENCES BODY(id)",
         ]
     }
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                as_json!(self.inventory),
+                as_json!(self.spells),
+                as_json!(self.ai_data),
+                as_json!(self.ai_packages),
+                as_json!(self.travel_destinations),
+                as_option!(self.race),
+                as_option!(self.class),
+                as_option!(self.faction),
+                as_option!(self.head),
+                as_option!(self.hair),
+                as_json!(self.npc_flags),
+                self.blood_type,
+                self.data.level,
+                as_json!(self.data.stats),
+                self.data.disposition,
+                self.data.reputation,
+                self.data.rank,
+                self.data.gold
+            ],
+        )
     }
 }

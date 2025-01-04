@@ -184,9 +184,10 @@ impl LandscapeFlags {
 impl SqlInfo for Landscape {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("flags", "TEXT"),           //json
             ("grid", "TEXT"),            //json
-            ("landscape_flags", "TEXT"), //json
+            ("landscape_flags", "TEXT"), //flags
+            ("texture_indices", "TEXT"), //json
+                                         // todo blobs
         ]
     }
 
@@ -196,5 +197,18 @@ impl SqlInfo for Landscape {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_sql!(self.grid),
+                as_json!(self.landscape_flags),
+                as_json!(self.texture_indices),
+            ],
+        )
     }
 }

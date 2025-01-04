@@ -114,9 +114,9 @@ impl SqlInfo for Ingredient {
             ("icon", "TEXT"),
             ("weight", "REAL"),
             ("value", "INTEGER"),
-            ("effects", "TEXT"),    //json
-            ("skills", "TEXT"),     //json
-            ("attributes", "TEXT"), //json
+            ("effects", "TEXT"),    //array
+            ("skills", "TEXT"),     //array
+            ("attributes", "TEXT"), //array
         ]
     }
 
@@ -126,5 +126,24 @@ impl SqlInfo for Ingredient {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                self.data.weight,
+                self.data.value,
+                as_json!(self.data.effects),
+                as_json!(self.data.skills),
+                as_json!(self.data.attributes),
+            ],
+        )
     }
 }

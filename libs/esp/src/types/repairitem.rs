@@ -119,10 +119,28 @@ impl SqlInfo for RepairItem {
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(script) REFERENCES SCPT(name)"]
+        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
     }
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                self.data.weight,
+                self.data.value,
+                self.data.uses,
+                self.data.quality,
+            ],
+        )
     }
 }

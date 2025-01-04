@@ -129,7 +129,7 @@ impl SqlInfo for Clothing {
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
             ("enchanting", "TEXT"),    //FK
-            ("biped_objects", "TEXT"), //json
+            ("biped_objects", "TEXT"), //array
             ("clothing_type", "TEXT"), //enum
             ("weight", "REAL"),
             ("value", "INTEGER"),
@@ -146,5 +146,25 @@ impl SqlInfo for Clothing {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                as_option!(self.enchanting),
+                as_json!(self.biped_objects),
+                as_enum!(self.data.clothing_type),
+                self.data.weight,
+                self.data.value,
+                self.data.enchantment,
+            ],
+        )
     }
 }

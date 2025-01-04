@@ -266,16 +266,16 @@ impl SqlInfo for Creature {
             ("name", "TEXT"),
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
-            ("inventory", "TEXT"),           //json
-            ("spells", "TEXT"),              //json
+            ("inventory", "TEXT"),           //array
+            ("spells", "TEXT"),              //array
             ("ai_data", "TEXT"),             //json
-            ("ai_packages", "TEXT"),         //json
-            ("travel_destinations", "TEXT"), //json
-            ("sound", "TEXT"),
+            ("ai_packages", "TEXT"),         //array
+            ("travel_destinations", "TEXT"), //array
+            ("sound", "TEXT"),               //FK
             ("scale", "REAL"),
-            ("creature_flags", "TEXT"), //json
+            ("creature_flags", "TEXT"), //flags
             ("blood_type", "INTEGER"),
-            ("creature_type", "TEXT"), //json
+            ("creature_type", "TEXT"), //enun
             ("level", "INTEGER"),
             ("strength", "INTEGER"),
             ("intelligence", "INTEGER"),
@@ -303,10 +303,59 @@ impl SqlInfo for Creature {
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
+        vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(sound) REFERENCES SNDG(id)",
+        ]
     }
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                as_json!(self.inventory),
+                as_json!(self.spells),
+                as_json!(self.ai_data),
+                as_json!(self.ai_packages),
+                as_json!(self.travel_destinations),
+                as_option!(self.sound),
+                self.scale,
+                as_json!(self.creature_flags),
+                self.blood_type,
+                as_enum!(self.data.creature_type),
+                self.data.level,
+                self.data.strength,
+                self.data.intelligence,
+                self.data.willpower,
+                self.data.agility,
+                self.data.speed,
+                self.data.endurance,
+                self.data.personality,
+                self.data.luck,
+                self.data.health,
+                self.data.magicka,
+                self.data.fatigue,
+                self.data.soul,
+                self.data.combat,
+                self.data.magic,
+                self.data.stealth,
+                self.data.attack1.0,
+                self.data.attack1.1,
+                self.data.attack2.0,
+                self.data.attack2.1,
+                self.data.attack3.0,
+                self.data.attack3.1,
+                self.data.gold,
+            ],
+        )
     }
 }

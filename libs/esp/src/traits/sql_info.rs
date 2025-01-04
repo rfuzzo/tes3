@@ -1,5 +1,37 @@
 use crate::prelude::*;
 
+#[macro_export]
+macro_rules! as_json {
+    ( $x:expr ) => {
+        serde_json::to_string_pretty(&$x).unwrap()
+    };
+}
+
+#[macro_export]
+macro_rules! as_option {
+    ( $x:expr ) => {
+        if $x.is_empty() {
+            None
+        } else {
+            Some($x.to_owned())
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! as_enum {
+    ( $x:expr ) => {
+        format!("{:?}", $x)
+    };
+}
+
+#[macro_export]
+macro_rules! as_sql {
+    ( $x:expr ) => {
+        format!("{:?}", $x)
+    };
+}
+
 #[derive(Debug)]
 pub struct TableSchema {
     pub name: &'static str,
@@ -12,7 +44,7 @@ pub trait SqlInfo {
     fn table_constraints(&self) -> Vec<&'static str>;
     fn table_name(&self) -> &'static str;
 
-    fn table_insert(&self) -> String {
+    fn table_insert_text(&self) -> String {
         let variable_names = self
             .table_columns()
             .iter()
@@ -42,6 +74,7 @@ pub trait SqlInfo {
         );
         str.to_string()
     }
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize>;
 
     fn table_schema(&self) -> TableSchema {
         TableSchema {
@@ -71,6 +104,14 @@ impl SqlInfo for TES3Object {
         delegate! {
             match self {
                 inner => inner.table_constraints()
+            }
+        }
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        delegate! {
+            match self {
+                inner => inner.table_insert(db, name)
             }
         }
     }

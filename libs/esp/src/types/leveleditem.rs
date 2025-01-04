@@ -107,7 +107,7 @@ fn err() -> io::Error {
 impl SqlInfo for LeveledItem {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("leveled_item_flags", "TEXT"), //json
+            ("leveled_item_flags", "TEXT"), //flags
             ("chance_none", "INTEGER"),
             ("items", "TEXT"), //array
         ]
@@ -119,5 +119,18 @@ impl SqlInfo for LeveledItem {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                as_json!(self.leveled_item_flags),
+                self.chance_none,
+                as_json!(self.items)
+            ],
+        )
     }
 }

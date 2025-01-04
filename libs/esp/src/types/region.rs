@@ -172,7 +172,7 @@ impl SqlInfo for Region {
             ("snow", "INTEGER"),
             ("blizzard", "INTEGER"),
             ("sleep_creature", "TEXT"),
-            ("map_color", "TEXT"), //json
+            ("map_color", "TEXT"), //color
             ("sounds", "TEXT"),    //aray
         ]
     }
@@ -183,5 +183,29 @@ impl SqlInfo for Region {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                self.weather_chances.clear,
+                self.weather_chances.cloudy,
+                self.weather_chances.foggy,
+                self.weather_chances.overcast,
+                self.weather_chances.rain,
+                self.weather_chances.thunder,
+                self.weather_chances.ash,
+                self.weather_chances.blight,
+                self.weather_chances.snow,
+                self.weather_chances.blizzard,
+                self.sleep_creature,
+                as_json!(self.map_color),
+                as_json!(self.sounds)
+            ],
+        )
     }
 }

@@ -80,9 +80,9 @@ impl Save for Activator {
 impl SqlInfo for Activator {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            (name_of!(name in Activator), "TEXT"),
-            (name_of!(script in Activator), "TEXT"),
-            (name_of!(mesh in Activator), "TEXT"),
+            ("name", "TEXT"),
+            ("script", "TEXT"), // FK
+            ("mesh", "TEXT"),
         ]
     }
 
@@ -92,5 +92,12 @@ impl SqlInfo for Activator {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![self.editor_id(), name, self.name, as_option!(self.script), self.mesh],
+        )
     }
 }

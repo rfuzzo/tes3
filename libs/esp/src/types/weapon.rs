@@ -133,7 +133,7 @@ impl SqlInfo for Weapon {
             ("enchanting", "TEXT"), //FK
             ("weight", "REAL"),
             ("value", "INTEGER"),
-            ("weapon_type", "TEXT"), //json
+            ("weapon_type", "TEXT"), //enum
             ("health", "INTEGER"),
             ("speed", "REAL"),
             ("reach", "REAL"),
@@ -144,7 +144,7 @@ impl SqlInfo for Weapon {
             ("slash_max", "INTEGER"),
             ("thrust_min", "INTEGER"),
             ("thrust_max", "INTEGER"),
-            ("flags", "TEXT"), //json
+            ("flags", "TEXT"), //flags
         ]
     }
 
@@ -157,5 +157,34 @@ impl SqlInfo for Weapon {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                as_option!(self.enchanting),
+                self.data.weight,
+                self.data.value,
+                as_enum!(self.data.weapon_type),
+                self.data.health,
+                self.data.speed,
+                self.data.reach,
+                self.data.enchantment,
+                self.data.chop_min,
+                self.data.chop_max,
+                self.data.slash_min,
+                self.data.slash_max,
+                self.data.thrust_min,
+                self.data.thrust_max,
+                as_json!(self.data.flags)
+            ],
+        )
     }
 }

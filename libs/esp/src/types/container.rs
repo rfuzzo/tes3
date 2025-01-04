@@ -114,8 +114,8 @@ impl SqlInfo for Container {
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("encumbrance", "REAL"),
-            ("container_flags", "TEXT"), //json
-            ("inventory", "TEXT"),       //json
+            ("container_flags", "TEXT"), //flags
+            ("inventory", "TEXT"),       //array
         ]
     }
 
@@ -125,5 +125,21 @@ impl SqlInfo for Container {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.encumbrance,
+                as_json!(self.container_flags),
+                as_json!(self.inventory),
+            ],
+        )
     }
 }

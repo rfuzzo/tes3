@@ -112,7 +112,7 @@ impl SqlInfo for MiscItem {
             ("icon", "TEXT"),
             ("weight", "REAL"),
             ("value", "INTEGER"),
-            ("flags", "TEXT"), //json
+            ("flags", "TEXT"), //flags
         ]
     }
 
@@ -122,5 +122,22 @@ impl SqlInfo for MiscItem {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                self.data.weight,
+                self.data.value,
+                as_json!(self.data.flags)
+            ],
+        )
     }
 }

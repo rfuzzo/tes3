@@ -108,11 +108,11 @@ impl SqlInfo for Header {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("version", "REAL"),
-            ("file_type", "TEXT"),
-            ("author", "TEXT"),
-            ("description", "TEXT"),
+            ("file_type", "TEXT"),   //enum
+            ("author", "TEXT"),      //fixed string
+            ("description", "TEXT"), //fixed string
             ("num_objects", "INTEGER"),
-            ("masters", "TEXT"), //json
+            ("masters", "TEXT"), //array
         ]
     }
 
@@ -122,5 +122,21 @@ impl SqlInfo for Header {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.version,
+                as_enum!(self.file_type),
+                self.author.to_string(),
+                self.description.to_string(),
+                self.num_objects,
+                as_json!(self.masters),
+            ],
+        )
     }
 }

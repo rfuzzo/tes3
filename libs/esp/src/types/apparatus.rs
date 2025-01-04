@@ -108,10 +108,10 @@ impl SqlInfo for Apparatus {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"),
+            ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("apparatus_type", "TEXT"),
+            ("apparatus_type", "TEXT"), //enum
             ("quality", "REAL"),
             ("weight", "REAL"),
             ("value", "INTEGER"),
@@ -124,5 +124,23 @@ impl SqlInfo for Apparatus {
 
     fn table_name(&self) -> &'static str {
         self.tag_str()
+    }
+
+    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text().as_str(),
+            params![
+                self.editor_id(),
+                name,
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                as_enum!(self.data.apparatus_type),
+                self.data.quality,
+                self.data.weight,
+                self.data.value,
+            ],
+        )
     }
 }

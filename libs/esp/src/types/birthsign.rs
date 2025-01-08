@@ -101,21 +101,12 @@ impl SqlInfo for Birthsign {
         vec![]
     }
 
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
         db.execute(
-            self.table_insert_text().as_str(),
-            params![
-                self.editor_id(),
-                name,
-                self.name,
-                self.texture,
-                self.description,
-                as_json!(self.spells)
-            ],
+            sql.as_str(),
+            params![self.name, self.texture, self.description, as_json!(self.spells)],
         )
     }
 }

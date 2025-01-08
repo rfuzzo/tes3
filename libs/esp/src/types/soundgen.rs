@@ -93,19 +93,15 @@ impl SqlInfo for SoundGen {
         ]
     }
 
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
         db.execute(
-            self.table_insert_text().as_str(),
+            sql.as_str(),
             params![
-                self.editor_id(),
-                name,
                 as_enum!(self.sound_gen_type),
-                as_option!(self.creature),
-                as_option!(self.sound),
+                as_option!(self.creature.to_lowercase()),
+                as_option!(self.sound.to_lowercase()),
             ],
         )
     }

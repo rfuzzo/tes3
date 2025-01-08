@@ -120,20 +120,12 @@ impl SqlInfo for Class {
         ]
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
-        vec![]
-    }
-
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
         db.execute(
-            self.table_insert_text().as_str(),
+            sql.as_str(),
             params![
-                self.editor_id(),
-                name,
                 self.name,
                 self.description,
                 as_enum!(self.data.attribute1),
@@ -149,8 +141,8 @@ impl SqlInfo for Class {
                 as_enum!(self.data.major4),
                 as_enum!(self.data.minor5),
                 as_enum!(self.data.major5),
-                as_json!(self.data.flags),
-                as_json!(self.data.services),
+                as_flags!(self.data.flags),
+                as_flags!(self.data.services),
             ],
         )
     }

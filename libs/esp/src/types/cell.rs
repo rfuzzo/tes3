@@ -285,18 +285,14 @@ impl SqlInfo for Cell {
         vec!["FOREIGN KEY(region) REFERENCES REGN(id)"]
     }
 
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let references = serde_json::to_string_pretty(&self.references.values().collect::<Vec<_>>()).unwrap();
 
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
         db.execute(
-            self.table_insert_text().as_str(),
+            sql.as_str(),
             params![
-                self.editor_id(),
-                name,
                 self.name,
                 as_json!(self.data.flags),
                 as_sql!(self.data.grid),

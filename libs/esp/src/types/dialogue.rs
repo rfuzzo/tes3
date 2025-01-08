@@ -71,18 +71,9 @@ impl SqlInfo for Dialogue {
         vec![("dialogue_type", "TEXT")] //enum
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
-        vec![]
-    }
-
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text().as_str(),
-            params![self.editor_id(), name, as_enum!(self.dialogue_type),],
-        )
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
+        db.execute(sql.as_str(), params![as_enum!(self.dialogue_type),])
     }
 }

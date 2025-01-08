@@ -82,25 +82,19 @@ impl Save for GlobalVariable {
 
 impl SqlInfo for GlobalVariable {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![("value", "TEXT")] //json
+        vec![("value", "TEXT")]
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
-        vec![]
-    }
-
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let value = match self.value {
             GlobalValue::Float(f) => f.to_string(),
             GlobalValue::Short(s) => s.to_string(),
             GlobalValue::Long(l) => l.to_string(),
         };
 
-        db.execute(self.table_insert_text().as_str(), params![self.editor_id(), name, value])
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
+        db.execute(sql.as_str(), params![value])
     }
 }
 

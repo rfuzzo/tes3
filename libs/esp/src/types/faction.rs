@@ -180,34 +180,26 @@ impl SqlInfo for Faction {
             ("name", "TEXT"),
             ("rank_names", "TEXT"),         //array
             ("reactions", "TEXT"),          //array
-            ("favored_attributes", "TEXT"), //enum
-            ("requirements", "TEXT"),       //array
-            ("favored_skills", "TEXT"),     //array
+            ("favored_attributes", "TEXT"), //fixed array
+            ("requirements", "TEXT"),       //fixed array
+            ("favored_skills", "TEXT"),     //fixed array
             ("flags", "TEXT"),              //flags
         ]
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
-        vec![]
-    }
-
-    fn table_name(&self) -> &'static str {
-        self.tag_str()
-    }
-
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        let as_tes3: TES3Object = self.clone().into();
+        let sql = as_tes3.table_insert_text(mod_name);
         db.execute(
-            self.table_insert_text().as_str(),
+            sql.as_str(),
             params![
-                self.editor_id(),
-                name,
                 self.name,
                 as_json!(self.rank_names),
                 as_json!(self.reactions),
                 as_json!(self.data.favored_attributes),
                 as_json!(self.data.requirements),
                 as_json!(self.data.favored_skills),
-                as_json!(self.data.flags)
+                as_flags!(self.data.flags)
             ],
         )
     }

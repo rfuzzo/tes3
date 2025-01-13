@@ -91,7 +91,6 @@ impl SqlInfo for Spell {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("effects", "TEXT"),    //array
             ("spell_type", "TEXT"), //enum
             ("cost", "INTEGER"),
             ("flags", "TEXT"), //flags
@@ -105,11 +104,18 @@ impl SqlInfo for Spell {
             sql.as_str(),
             params![
                 self.name,
-                as_json!(self.effects),
                 as_enum!(self.data.spell_type),
                 self.data.cost,
                 as_json!(self.data.flags),
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for effect in &self.effects {
+                let links: [&dyn ToSql; 2] = [&self.editor_id(), &Null];
+                effect.table_insert(db, mod_name, &links)?;
+            }
+            Ok(1)
+        })
     }
 }

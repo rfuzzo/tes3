@@ -82,7 +82,6 @@ impl Save for Enchanting {
 impl SqlInfo for Enchanting {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("effects", "TEXT"),      //json
             ("enchant_type", "TEXT"), //enum
             ("cost", "INTEGER"),
             ("max_charge", "INTEGER"),
@@ -96,12 +95,19 @@ impl SqlInfo for Enchanting {
         db.execute(
             sql.as_str(),
             params![
-                as_json!(self.effects),
                 as_enum!(self.data.enchant_type),
                 self.data.cost,
                 self.data.max_charge,
-                as_json!(self.data.flags),
+                as_flags!(self.data.flags),
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for effect in &self.effects {
+                let links: [&dyn ToSql; 2] = [&Null, &self.editor_id()];
+                effect.table_insert(db, mod_name, &links)?;
+            }
+            Ok(1)
+        })
     }
 }

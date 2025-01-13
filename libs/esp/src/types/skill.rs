@@ -84,7 +84,10 @@ impl SqlInfo for Skill {
             ("skill_id", "TEXT"), //enum
             ("governing_attribute", "INTEGER"),
             ("specialization", "INTEGER"),
-            ("actions", "TEXT"), //array
+            ("action_1", "TEXT"),
+            ("action_2", "TEXT"),
+            ("action_3", "TEXT"),
+            ("action_4", "TEXT"),
             ("description", "TEXT"),
         ]
     }
@@ -98,7 +101,10 @@ impl SqlInfo for Skill {
                 as_enum!(self.skill_id),
                 self.data.governing_attribute,
                 self.data.specialization,
-                as_json!(self.data.actions),
+                self.data.actions[0],
+                self.data.actions[1],
+                self.data.actions[2],
+                self.data.actions[3],
                 self.description,
             ],
         )

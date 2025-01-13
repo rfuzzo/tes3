@@ -129,7 +129,6 @@ impl SqlInfo for Clothing {
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
             ("enchanting", "TEXT"),    //FK
-            ("biped_objects", "TEXT"), //array
             ("clothing_type", "TEXT"), //enum
             ("weight", "REAL"),
             ("value", "INTEGER"),
@@ -155,12 +154,18 @@ impl SqlInfo for Clothing {
                 self.mesh,
                 self.icon,
                 as_option!(self.enchanting),
-                as_json!(self.biped_objects),
                 as_enum!(self.data.clothing_type),
                 self.data.weight,
                 self.data.value,
                 self.data.enchantment,
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for biped_object in &self.biped_objects {
+                biped_object.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
+            }
+            Ok(1)
+        })
     }
 }

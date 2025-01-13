@@ -70,7 +70,7 @@ impl Save for LandscapeTexture {
 
 impl SqlInfo for LandscapeTexture {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![("idx", "INTEGER"), ("file_name", "TEXT")]
+        vec![("index", "INTEGER"), ("file_name", "TEXT")]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {

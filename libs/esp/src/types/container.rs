@@ -115,7 +115,6 @@ impl SqlInfo for Container {
             ("mesh", "TEXT"),
             ("encumbrance", "REAL"),
             ("container_flags", "TEXT"), //flags
-            ("inventory", "TEXT"),       //array
         ]
     }
 
@@ -134,8 +133,19 @@ impl SqlInfo for Container {
                 self.mesh,
                 self.encumbrance,
                 as_json!(self.container_flags),
-                as_json!(self.inventory),
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for (idx, item_id) in &self.inventory {
+                let join = InventoryJoin {
+                    index: *idx,
+                    item_id: item_id.to_string(),
+                };
+                let links: [&dyn ToSql; 1] = [&self.editor_id()];
+                join.table_insert(db, mod_name, &links)?;
+            }
+            Ok(0)
+        })
     }
 }

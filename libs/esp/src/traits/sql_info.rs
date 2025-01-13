@@ -56,7 +56,59 @@ pub trait SqlInfo {
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![]
     }
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize>;
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize>;
+}
+
+pub trait SqlJoinInfo {
+    fn table_name(&self) -> &'static str;
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)>;
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec![]
+    }
+    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize>;
+
+    fn table_insert_text(&self, mod_name: &str) -> String {
+        let variable_names = self
+            .table_columns()
+            .iter()
+            .map(|(name, _)| name.to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let params = self
+            .table_columns()
+            .iter()
+            .enumerate()
+            .map(|(i, _)| format!("?{}", i + 2))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let str = format!(
+            "INSERT INTO {}
+            (
+            mod {}
+            ) 
+            VALUES
+            (
+            {}, {}
+            )",
+            self.table_name(),
+            variable_names,
+            mod_name,
+            params
+        );
+        str.to_string()
+    }
+    fn table_schema(&self) -> TableSchema {
+        TableSchema {
+            name: self.table_name(),
+            columns: self
+                .table_columns()
+                .iter()
+                .map(|(name, ty)| format!("{} {}", name, ty))
+                .collect::<Vec<_>>(),
+            constraints: self.table_constraints(),
+        }
+    }
 }
 
 impl SqlInfo for TES3Object {

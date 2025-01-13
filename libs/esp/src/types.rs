@@ -111,32 +111,32 @@ pub use weapon::*;
 #[derive(TES3Object, Clone, Debug, From, PartialEq)]
 pub enum TES3Object {
     #[tag("TES3")] Header(Header),
-    #[tag("GMST")] GameSetting(GameSetting),
-    #[tag("GLOB")] GlobalVariable(GlobalVariable),
-    #[tag("CLAS")] Class(Class),
+    #[tag("GMST")] GameSetting(GameSetting),            // done
+    #[tag("GLOB")] GlobalVariable(GlobalVariable),      // done
+    #[tag("CLAS")] Class(Class),                        // done
     #[tag("FACT")] Faction(Faction),
-    #[tag("RACE")] Race(Race),
-    #[tag("SOUN")] Sound(Sound),
-    #[tag("SNDG")] SoundGen(SoundGen),
-    #[tag("SKIL")] Skill(Skill),
-    #[tag("MGEF")] MagicEffect(MagicEffect),
-    #[tag("SCPT")] Script(Script),
-    #[tag("REGN")] Region(Region),
-    #[tag("BSGN")] Birthsign(Birthsign),
-    #[tag("SSCR")] StartScript(StartScript),
-    #[tag("LTEX")] LandscapeTexture(LandscapeTexture),
-    #[tag("SPEL")] Spell(Spell),
-    #[tag("STAT")] Static(Static),
-    #[tag("DOOR")] Door(Door),
-    #[tag("MISC")] MiscItem(MiscItem),
-    #[tag("WEAP")] Weapon(Weapon),
-    #[tag("CONT")] Container(Container),
+    #[tag("RACE")] Race(Race),                          // done
+    #[tag("SOUN")] Sound(Sound),                        // done
+    #[tag("SNDG")] SoundGen(SoundGen),                  // done
+    #[tag("SKIL")] Skill(Skill),                        // done
+    #[tag("MGEF")] MagicEffect(MagicEffect),            // color
+    #[tag("SCPT")] Script(Script),                      // incomplete
+    #[tag("REGN")] Region(Region),                      // color
+    #[tag("BSGN")] Birthsign(Birthsign),                // done
+    #[tag("SSCR")] StartScript(StartScript),            // done
+    #[tag("LTEX")] LandscapeTexture(LandscapeTexture),  // done
+    #[tag("SPEL")] Spell(Spell),                        // done
+    #[tag("STAT")] Static(Static),                      // done
+    #[tag("DOOR")] Door(Door),          // done
+    #[tag("MISC")] MiscItem(MiscItem),  // done
+    #[tag("WEAP")] Weapon(Weapon),      // done
+    #[tag("CONT")] Container(Container),// done
     #[tag("CREA")] Creature(Creature),
-    #[tag("BODY")] Bodypart(Bodypart),
-    #[tag("LIGH")] Light(Light),
-    #[tag("ENCH")] Enchanting(Enchanting),
+    #[tag("BODY")] Bodypart(Bodypart),  // done
+    #[tag("LIGH")] Light(Light),        // color
+    #[tag("ENCH")] Enchanting(Enchanting),  // done
     #[tag("NPC_")] Npc(Npc),
-    #[tag("ARMO")] Armor(Armor),
+    #[tag("ARMO")] Armor(Armor),            // done
     #[tag("CLOT")] Clothing(Clothing),
     #[tag("REPA")] RepairItem(RepairItem),
     #[tag("ACTI")] Activator(Activator),

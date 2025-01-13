@@ -89,12 +89,7 @@ impl Save for Birthsign {
 
 impl SqlInfo for Birthsign {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![
-            ("name", "TEXT"),
-            ("texture", "TEXT"),
-            ("description", "TEXT"),
-            ("spells", "TEXT"), // array
-        ]
+        vec![("name", "TEXT"), ("texture", "TEXT"), ("description", "TEXT")]
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
@@ -104,9 +99,18 @@ impl SqlInfo for Birthsign {
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
-            params![self.name, self.texture, self.description, as_json!(self.spells)],
-        )
+        db.execute(sql.as_str(), params![self.name, self.texture, self.description])
+            // join tables
+            .and_then(|_| {
+                for spell_id in &self.spells {
+                    let join = SpellJoin {
+                        spell_id: spell_id.clone(),
+                    };
+
+                    let links: [&dyn ToSql; 2] = [&Null, &self.editor_id()];
+                    join.table_insert(db, mod_name, &links)?;
+                }
+                Ok(1)
+            })
     }
 }

@@ -95,7 +95,7 @@ impl Save for Script {
 impl SqlInfo for Script {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![("text", "TEXT")]
-        //todo
+        // todo
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {

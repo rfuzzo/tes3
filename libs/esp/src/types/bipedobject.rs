@@ -51,3 +51,40 @@ impl Save for BipedObject {
         Ok(())
     }
 }
+
+impl SqlJoinInfo for BipedObject {
+    fn table_name(&self) -> &'static str {
+        "JOIN_BipedObject"
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        // TODO add unique constraint
+        vec![]
+    }
+
+    fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            // parents
+            ("armo_id", "TEXT"), //FK
+            ("clot_id", "TEXT"), //FK
+            // this
+            ("biped_object_type", "TEXT"), //enum
+            ("male_bodypart", "TEXT"),     //fk
+            ("female_bodypart", "TEXT"),   //fk
+        ]
+    }
+
+    // used in ARMO, CLOT
+    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        db.execute(
+            self.table_insert_text(mod_name).as_str(),
+            params![
+                links[0],
+                links[1],
+                as_enum!(self.biped_object_type),
+                self.male_bodypart,
+                self.female_bodypart
+            ],
+        )
+    }
+}

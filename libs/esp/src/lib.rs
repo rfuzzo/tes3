@@ -23,6 +23,7 @@ pub(crate) mod prelude {
     pub use derive_more::{Deref, DerefMut, From, Into};
     pub use hashbrown::{HashMap, HashSet};
     pub use rusqlite::params;
+    pub use rusqlite::types::Null;
     pub use rusqlite::Connection;
     pub use rusqlite::ToSql;
     pub use smart_default::SmartDefault;

@@ -127,7 +127,7 @@ impl SqlInfo for Race {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("spells", "TEXT"), //array
+            ("spells", "TEXT"), // array
             ("description", "TEXT"),
             ("skill_0", "TEXT"), //enum
             ("bonus_0", "INTEGER"),
@@ -164,7 +164,6 @@ impl SqlInfo for Race {
             sql.as_str(),
             params![
                 self.name,
-                as_json!(self.spells),
                 self.description,
                 as_enum!(self.data.skill_bonuses.skill_0),
                 self.data.skill_bonuses.bonus_0,
@@ -193,5 +192,17 @@ impl SqlInfo for Race {
                 as_json!(self.data.flags),
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for spell_id in &self.spells {
+                let join = SpellJoin {
+                    spell_id: spell_id.clone(),
+                };
+
+                let links: [&dyn ToSql; 2] = [&self.editor_id(), &Null];
+                join.table_insert(db, mod_name, &links)?;
+            }
+            Ok(1)
+        })
     }
 }

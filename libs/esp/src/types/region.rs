@@ -172,8 +172,8 @@ impl SqlInfo for Region {
             ("snow", "INTEGER"),
             ("blizzard", "INTEGER"),
             ("sleep_creature", "TEXT"),
-            ("map_color", "TEXT"), //color
-            ("sounds", "TEXT"),    //aray
+            ("map_color", "TEXT"), // color
+            ("sounds", "TEXT"),    // array
         ]
     }
 
@@ -196,8 +196,18 @@ impl SqlInfo for Region {
                 self.weather_chances.blizzard,
                 self.sleep_creature,
                 as_json!(self.map_color),
-                as_json!(self.sounds)
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for (sound_id, _) in &self.sounds {
+                let join = SoundJoin {
+                    sound_id: sound_id.to_string(),
+                };
+                let links: [&dyn ToSql; 1] = [&self.editor_id()];
+                join.table_insert(db, mod_name, &links)?;
+            }
+            Ok(0)
+        })
     }
 }

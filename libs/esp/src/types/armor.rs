@@ -130,9 +130,8 @@ impl SqlInfo for Armor {
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("enchanting", "TEXT"),    //FK
-            ("biped_objects", "TEXT"), //array
-            ("armor_type", "TEXT"),    //enum
+            ("enchanting", "TEXT"), //FK
+            ("armor_type", "TEXT"), //enum
             ("weight", "REAL"),
             ("value", "INTEGER"),
             ("health", "INTEGER"),
@@ -159,7 +158,6 @@ impl SqlInfo for Armor {
                 self.mesh,
                 self.icon,
                 as_option!(self.enchanting),
-                as_json!(self.biped_objects),
                 as_enum!(self.data.armor_type),
                 self.data.weight,
                 self.data.value,
@@ -168,5 +166,12 @@ impl SqlInfo for Armor {
                 self.data.armor_rating,
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for biped_object in &self.biped_objects {
+                biped_object.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
+            }
+            Ok(1)
+        })
     }
 }

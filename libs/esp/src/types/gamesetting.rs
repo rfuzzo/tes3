@@ -82,14 +82,22 @@ impl Save for GameSetting {
 
 impl SqlInfo for GameSetting {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![
-            ("value", "TEXT"), //json
-        ]
+        vec![("type", "TEXT"), ("val", "TEXT")]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        let type_name = match &self.value {
+            GameSettingValue::Float(_) => "Float".to_string(),
+            GameSettingValue::Integer(_) => "Integer".to_string(),
+            GameSettingValue::String(_) => "String".to_string(),
+        };
+        let value = match &self.value {
+            GameSettingValue::Float(f) => f.to_string(),
+            GameSettingValue::Integer(i) => i.to_string(),
+            GameSettingValue::String(s) => s.to_string(),
+        };
+
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(sql.as_str(), params![as_json!(self.value)])
+        as_tes3.table_insert2(db, mod_name, params![type_name, value])
     }
 }

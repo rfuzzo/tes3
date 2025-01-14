@@ -188,43 +188,44 @@ impl SqlInfo for Faction {
             ("favored_skills_5", "TEXT"),     //enum
             ("favored_skills_6", "TEXT"),     //enum
             ("favored_skills_7", "TEXT"),     //enum
-            ("flags", "TEXT"),                //flags
+            ("dataflags", "TEXT"),            //flags
         ]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
-            params![
-                self.name,
-                as_sql!(self.rank_names),
-                as_enum!(self.data.favored_attributes[0]),
-                as_enum!(self.data.favored_attributes[1]),
-                as_enum!(self.data.favored_skills[0]),
-                as_enum!(self.data.favored_skills[1]),
-                as_enum!(self.data.favored_skills[2]),
-                as_enum!(self.data.favored_skills[3]),
-                as_enum!(self.data.favored_skills[4]),
-                as_enum!(self.data.favored_skills[5]),
-                as_enum!(self.data.favored_skills[6]),
-                as_flags!(self.data.flags)
-            ],
-        )
-        // join tables
-        .and_then(|_| {
-            for reaction in &self.reactions {
-                reaction.table_insert(db, mod_name, &[&self.editor_id()])?;
-            }
-            Ok(0)
-        })
-        .and_then(|_| {
-            for requirement in &self.data.requirements {
-                requirement.table_insert(db, mod_name, &[&self.editor_id()])?;
-            }
-            Ok(0)
-        })
+        as_tes3
+            .table_insert2(
+                db,
+                mod_name,
+                params![
+                    self.name,
+                    as_sql!(self.rank_names),
+                    as_enum!(self.data.favored_attributes[0]),
+                    as_enum!(self.data.favored_attributes[1]),
+                    as_enum!(self.data.favored_skills[0]),
+                    as_enum!(self.data.favored_skills[1]),
+                    as_enum!(self.data.favored_skills[2]),
+                    as_enum!(self.data.favored_skills[3]),
+                    as_enum!(self.data.favored_skills[4]),
+                    as_enum!(self.data.favored_skills[5]),
+                    as_enum!(self.data.favored_skills[6]),
+                    as_flags!(self.data.flags)
+                ],
+            )
+            // join tables
+            .and_then(|_| {
+                for reaction in &self.reactions {
+                    reaction.table_insert(db, mod_name, &[&self.editor_id()])?;
+                }
+                Ok(0)
+            })
+            .and_then(|_| {
+                for requirement in &self.data.requirements {
+                    requirement.table_insert(db, mod_name, &[&self.editor_id()])?;
+                }
+                Ok(0)
+            })
     }
 }
 impl Faction {}

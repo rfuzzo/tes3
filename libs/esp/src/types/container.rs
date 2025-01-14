@@ -124,27 +124,28 @@ impl SqlInfo for Container {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.encumbrance,
-                as_flags!(self.container_flags),
-            ],
-        )
-        // join tables
-        .and_then(|_| {
-            for (idx, item_id) in &self.inventory {
-                let join = InventoryJoin {
-                    index: *idx,
-                    item_id: item_id.to_string(),
-                };
-                join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
-            }
-            Ok(0)
-        })
+        as_tes3
+            .table_insert2(
+                db,
+                mod_name,
+                params![
+                    self.name,
+                    as_option!(self.script),
+                    self.mesh,
+                    self.encumbrance,
+                    as_flags!(self.container_flags),
+                ],
+            )
+            // join tables
+            .and_then(|_| {
+                for (idx, item_id) in &self.inventory {
+                    let join = InventoryJoin {
+                        index: *idx,
+                        item_id: item_id.to_string(),
+                    };
+                    join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
+                }
+                Ok(0)
+            })
     }
 }

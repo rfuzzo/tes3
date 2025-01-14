@@ -32,10 +32,7 @@ impl SqlJoinInfo for SpellJoin {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
-            params![links[0], links[1], links[2], links[3], self.spell_id],
-        )
+        self.table_insert2(db, mod_name, params![links[0], links[1], links[2], links[3], self.spell_id])
     }
 }
 
@@ -63,7 +60,7 @@ impl SqlJoinInfo for SoundJoin {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(self.table_insert_text(mod_name).as_str(), params![links[0], self.sound_id])
+        self.table_insert2(db, mod_name, params![links[0], self.sound_id])
     }
 }
 
@@ -93,16 +90,13 @@ impl SqlJoinInfo for InventoryJoin {
             ("crea_id", "TEXT NOT NULL"), //FK
             ("npc_id", "TEXT NOT NULL"),  //FK
             // this
-            ("index", "INTEGER"),
+            ("idx", "INTEGER"),
             ("item_id", "TEXT"), //FK
         ]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
-            params![links[0], links[1], links[2], self.index, self.item_id],
-        )
+        self.table_insert2(db, mod_name, params![links[0], links[1], links[2], self.index, self.item_id])
     }
 }
 
@@ -132,10 +126,7 @@ impl SqlJoinInfo for ItemJoin {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
-            params![links[0], self.item_id, self.probability],
-        )
+        self.table_insert2(db, mod_name, params![links[0], self.item_id, self.probability])
     }
 }
 
@@ -165,10 +156,7 @@ impl SqlJoinInfo for CreatureJoin {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
-            params![links[0], self.creature_id, self.probability],
-        )
+        self.table_insert2(db, mod_name, params![links[0], self.creature_id, self.probability])
     }
 }
 
@@ -198,8 +186,9 @@ impl SqlJoinInfo for TravelDestination {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
+        self.table_insert2(
+            db,
+            mod_name,
             params![
                 links[0],
                 links[1],
@@ -236,7 +225,7 @@ impl SqlJoinInfo for AiPackage {
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
         let value = serde_json::to_string(&self).unwrap();
-        db.execute(self.table_insert_text(mod_name).as_str(), params![links[0], links[1], value])
+        self.table_insert2(db, mod_name, params![links[0], links[1], value])
     }
 }
 
@@ -255,7 +244,7 @@ impl SqlJoinInfo for Filter {
             // parents
             ("info_id", "TEXT NOT NULL"), //FK
             // this
-            ("index", "INTEGER"),
+            ("idx", "INTEGER"),
             ("filter_type", "TEXT"), //enum
             ("function", "TEXT"),    //enum
             ("comparison", "TEXT"),  //enum
@@ -265,8 +254,9 @@ impl SqlJoinInfo for Filter {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
+        self.table_insert2(
+            db,
+            mod_name,
             params![
                 links[0],
                 self.index,
@@ -301,10 +291,7 @@ impl SqlJoinInfo for FactionReaction {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
-            params![links[0], self.faction, self.reaction],
-        )
+        self.table_insert2(db, mod_name, params![links[0], self.faction, self.reaction])
     }
 }
 
@@ -331,8 +318,9 @@ impl SqlJoinInfo for FactionRequirement {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
+        self.table_insert2(
+            db,
+            mod_name,
             params![
                 links[0],
                 as_sql!(self.attributes),
@@ -372,8 +360,9 @@ impl SqlJoinInfo for BipedObject {
 
     // used in ARMO, CLOT
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
+        self.table_insert2(
+            db,
+            mod_name,
             params![
                 links[0],
                 links[1],
@@ -419,8 +408,9 @@ impl SqlJoinInfo for Effect {
 
     // used in SPELL, ENCH, ALCH
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
+        self.table_insert2(
+            db,
+            mod_name,
             params![
                 links[0],
                 links[1],
@@ -479,8 +469,9 @@ impl SqlJoinInfo for Reference {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        db.execute(
-            self.table_insert_text(mod_name).as_str(),
+        self.table_insert2(
+            db,
+            mod_name,
             params![
                 links[0],
                 links[1],

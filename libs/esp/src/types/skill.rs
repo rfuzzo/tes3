@@ -94,9 +94,9 @@ impl SqlInfo for Skill {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
+        as_tes3.table_insert2(
+            db,
+            mod_name,
             params![
                 as_enum!(self.skill_id),
                 self.data.governing_attribute,

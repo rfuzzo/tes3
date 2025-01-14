@@ -119,7 +119,7 @@ impl SqlInfo for Bodypart {
             //
             ("part", "TEXT"), //enum
             ("vampire", "INTEGER"),
-            ("flags", "TEXT"),         //flags
+            ("dataflags", "TEXT"),     //flags
             ("bodypart_type", "TEXT"), //enum
         ]
     }
@@ -130,9 +130,9 @@ impl SqlInfo for Bodypart {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
+        as_tes3.table_insert2(
+            db,
+            mod_name,
             params![
                 as_option!(self.race),
                 self.mesh,

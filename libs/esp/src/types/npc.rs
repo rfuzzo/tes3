@@ -408,73 +408,74 @@ impl SqlInfo for Npc {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                //
-                self.ai_data.hello,
-                self.ai_data.fight,
-                self.ai_data.flee,
-                self.ai_data.alarm,
-                as_flags!(self.ai_data.services),
-                //
-                as_option!(self.race),
-                as_option!(self.class),
-                as_option!(self.faction),
-                as_option!(self.head.to_lowercase()), //thanks todd
-                as_option!(self.hair.to_lowercase()), //thanks todd
-                as_flags!(self.npc_flags),
-                self.blood_type,
-                //
-                self.data.level,
-                //
-                self.data.stats.as_ref().map(|x| as_json!(x.attributes)),
-                self.data.stats.as_ref().map(|x| as_json!(x.skills)),
-                self.data.stats.as_ref().map(|x| x.health),
-                self.data.stats.as_ref().map(|x| x.magicka),
-                self.data.stats.as_ref().map(|x| x.fatigue),
-                //
-                self.data.disposition,
-                self.data.reputation,
-                self.data.rank,
-                self.data.gold
-            ],
-        )
-        // join tables
-        .and_then(|_| {
-            for (idx, item_id) in &self.inventory {
-                let join = InventoryJoin {
-                    index: *idx,
-                    item_id: item_id.to_string(),
-                };
-                join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id()])?;
-            }
-            Ok(0)
-        })
-        .and_then(|_| {
-            for spell_id in &self.spells {
-                let join = SpellJoin {
-                    spell_id: spell_id.clone(),
-                };
-                join.table_insert(db, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
-            }
-            Ok(1)
-        })
-        .and_then(|_| {
-            for dest in &self.travel_destinations {
-                dest.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
-            }
-            Ok(1)
-        })
-        .and_then(|_| {
-            for package in &self.ai_packages {
-                package.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
-            }
-            Ok(1)
-        })
+        as_tes3
+            .table_insert2(
+                db,
+                mod_name,
+                params![
+                    self.name,
+                    as_option!(self.script),
+                    self.mesh,
+                    //
+                    self.ai_data.hello,
+                    self.ai_data.fight,
+                    self.ai_data.flee,
+                    self.ai_data.alarm,
+                    as_flags!(self.ai_data.services),
+                    //
+                    as_option!(self.race),
+                    as_option!(self.class),
+                    as_option!(self.faction),
+                    as_option!(self.head.to_lowercase()), //thanks todd
+                    as_option!(self.hair.to_lowercase()), //thanks todd
+                    as_flags!(self.npc_flags),
+                    self.blood_type,
+                    //
+                    self.data.level,
+                    //
+                    self.data.stats.as_ref().map(|x| as_json!(x.attributes)),
+                    self.data.stats.as_ref().map(|x| as_json!(x.skills)),
+                    self.data.stats.as_ref().map(|x| x.health),
+                    self.data.stats.as_ref().map(|x| x.magicka),
+                    self.data.stats.as_ref().map(|x| x.fatigue),
+                    //
+                    self.data.disposition,
+                    self.data.reputation,
+                    self.data.rank,
+                    self.data.gold
+                ],
+            )
+            // join tables
+            .and_then(|_| {
+                for (idx, item_id) in &self.inventory {
+                    let join = InventoryJoin {
+                        index: *idx,
+                        item_id: item_id.to_string(),
+                    };
+                    join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id()])?;
+                }
+                Ok(0)
+            })
+            .and_then(|_| {
+                for spell_id in &self.spells {
+                    let join = SpellJoin {
+                        spell_id: spell_id.clone(),
+                    };
+                    join.table_insert(db, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
+                }
+                Ok(1)
+            })
+            .and_then(|_| {
+                for dest in &self.travel_destinations {
+                    dest.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
+                }
+                Ok(1)
+            })
+            .and_then(|_| {
+                for package in &self.ai_packages {
+                    package.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
+                }
+                Ok(1)
+            })
     }
 }

@@ -127,8 +127,8 @@ impl SqlInfo for Light {
             ("value", "INTEGER"),
             ("time", "INTEGER"),
             ("radius", "INTEGER"),
-            ("color", "TEXT"), // color
-            ("flags", "TEXT"), // flags
+            ("color", "TEXT"),     // color
+            ("dataflags", "TEXT"), // flags
         ]
     }
 
@@ -141,9 +141,9 @@ impl SqlInfo for Light {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
+        as_tes3.table_insert2(
+            db,
+            mod_name,
             params![
                 self.name,
                 as_option!(self.script),

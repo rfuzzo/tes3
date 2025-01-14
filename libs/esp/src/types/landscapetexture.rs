@@ -70,12 +70,11 @@ impl Save for LandscapeTexture {
 
 impl SqlInfo for LandscapeTexture {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
-        vec![("index", "INTEGER"), ("file_name", "TEXT")]
+        vec![("idx", "INTEGER"), ("file_name", "TEXT")]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(sql.as_str(), params![self.index, self.file_name])
+        as_tes3.table_insert2(db, mod_name, params![self.index, self.file_name])
     }
 }

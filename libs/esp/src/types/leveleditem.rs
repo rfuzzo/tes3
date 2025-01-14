@@ -114,8 +114,8 @@ impl SqlInfo for LeveledItem {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(sql.as_str(), params![as_flags!(self.leveled_item_flags), self.chance_none])
+        as_tes3
+            .table_insert2(db, mod_name, params![as_flags!(self.leveled_item_flags), self.chance_none])
             // join tables
             .and_then(|_| {
                 for (item_id, probability) in &self.items {

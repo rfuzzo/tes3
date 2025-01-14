@@ -62,8 +62,9 @@ pub struct TableSchema {
 }
 pub trait SqlInfoMeta {
     fn table_name(&self) -> &'static str;
-    fn table_insert_text(&self, mod_name: &str) -> String;
     fn table_schema(&self) -> TableSchema;
+
+    fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize>;
 }
 
 pub trait SqlInfo {
@@ -82,14 +83,14 @@ pub trait SqlJoinInfo {
     }
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize>;
 
-    fn table_insert_text(&self, mod_name: &str) -> String {
+    fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize> {
         let variable_names = self
             .table_columns()
             .iter()
             .map(|(name, _)| name.to_string())
             .collect::<Vec<_>>()
             .join(", ");
-        let params = self
+        let param_names = self
             .table_columns()
             .iter()
             .enumerate()
@@ -100,19 +101,23 @@ pub trait SqlJoinInfo {
         let str = format!(
             "INSERT INTO {}
             (
-            mod {}
+            mod, {}
             ) 
             VALUES
             (
-            {}, {}
+            ?1, {}
             )",
             self.table_name(),
             variable_names,
-            mod_name,
-            params
+            param_names,
         );
-        str.to_string()
+
+        let mut final_params = params![mod_name].to_vec();
+        final_params.extend_from_slice(params);
+
+        db.execute(str.as_str(), final_params.as_slice())
     }
+
     fn table_schema(&self) -> TableSchema {
         TableSchema {
             name: self.table_name(),
@@ -142,10 +147,10 @@ impl SqlInfo for TES3Object {
         }
     }
 
-    fn table_insert(&self, db: &Connection, name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         delegate! {
             match self {
-                inner => inner.table_insert(db, name)
+                inner => inner.table_insert(db, mod_name)
             }
         }
     }
@@ -168,14 +173,14 @@ impl SqlInfoMeta for TES3Object {
         }
     }
 
-    fn table_insert_text(&self, mod_name: &str) -> String {
+    fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize> {
         let variable_names = self
             .table_columns()
             .iter()
             .map(|(name, _)| name.to_string())
             .collect::<Vec<_>>()
             .join(", ");
-        let params = self
+        let param_names = self
             .table_columns()
             .iter()
             .enumerate()
@@ -183,22 +188,26 @@ impl SqlInfoMeta for TES3Object {
             .collect::<Vec<_>>()
             .join(", ");
 
+        let as_tes3: TES3Object = self.clone().into();
         let str = format!(
             "INSERT INTO {}
             (
-            id, mod, flags {}
+            id, mod, flags, {}
             ) 
             VALUES
             (
-            {}, {}, {}, {}
+            ?1, ?2, ?3, {}
             )",
-            self.table_name(),
+            as_tes3.table_name(),
             variable_names,
-            self.editor_id().to_lowercase(),
-            mod_name,
-            as_flags!(self.object_flags()),
-            params
+            param_names
         );
-        str.to_string()
+
+        let id = self.editor_id().to_lowercase();
+        let flags = as_flags!(self.object_flags());
+        let mut final_params = params![id, mod_name, flags].to_vec();
+        final_params.extend_from_slice(params);
+
+        db.execute(str.as_str(), final_params.as_slice())
     }
 }

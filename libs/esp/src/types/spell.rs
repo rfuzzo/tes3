@@ -91,30 +91,32 @@ impl SqlInfo for Spell {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
+            //
             ("spell_type", "TEXT"), //enum
             ("cost", "INTEGER"),
-            ("flags", "TEXT"), //flags
+            ("dataflags", "TEXT"), //flags
         ]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
-            params![
-                self.name,
-                as_enum!(self.data.spell_type),
-                self.data.cost,
-                as_flags!(self.data.flags),
-            ],
-        )
-        // join tables
-        .and_then(|_| {
-            for effect in &self.effects {
-                effect.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
-            }
-            Ok(1)
-        })
+        as_tes3
+            .table_insert2(
+                db,
+                mod_name,
+                params![
+                    self.name,
+                    as_enum!(self.data.spell_type),
+                    self.data.cost,
+                    as_flags!(self.data.flags),
+                ],
+            )
+            // join tables
+            .and_then(|_| {
+                for effect in &self.effects {
+                    effect.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
+                }
+                Ok(1)
+            })
     }
 }

@@ -104,8 +104,7 @@ impl SqlInfo for Enchanting {
         // join tables
         .and_then(|_| {
             for effect in &self.effects {
-                let links: [&dyn ToSql; 2] = [&Null, &self.editor_id()];
-                effect.table_insert(db, mod_name, &links)?;
+                effect.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
             }
             Ok(1)
         })

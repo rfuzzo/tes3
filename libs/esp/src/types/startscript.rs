@@ -73,6 +73,6 @@ impl SqlInfo for StartScript {
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(sql.as_str(), params![as_option!(self.script),])
+        db.execute(sql.as_str(), params![as_option!(self.script)])
     }
 }

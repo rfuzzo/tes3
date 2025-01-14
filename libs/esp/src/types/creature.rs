@@ -266,15 +266,18 @@ impl SqlInfo for Creature {
             ("name", "TEXT"),
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
-            ("inventory", "TEXT"),           //array
-            ("spells", "TEXT"),              //array
-            ("ai_data", "TEXT"),             //json
-            ("ai_packages", "TEXT"),         //array
-            ("travel_destinations", "TEXT"), //array
-            ("sound", "TEXT"),               //FK
+            // ai data
+            ("hello", "INTEGER"),
+            ("fight", "INTEGER"),
+            ("flee", "INTEGER"),
+            ("alarm", "INTEGER"),
+            ("services", "INTEGER"), // flags
+            //
+            ("sound", "TEXT"), //FK
             ("scale", "REAL"),
             ("creature_flags", "TEXT"), //flags
             ("blood_type", "INTEGER"),
+            // data
             ("creature_type", "TEXT"), //enun
             ("level", "INTEGER"),
             ("strength", "INTEGER"),
@@ -318,14 +321,14 @@ impl SqlInfo for Creature {
                 self.name,
                 as_option!(self.script),
                 self.mesh,
-                as_json!(self.inventory),
-                as_json!(self.spells),
-                as_json!(self.ai_data),
-                as_json!(self.ai_packages),
-                as_json!(self.travel_destinations),
+                self.ai_data.hello,
+                self.ai_data.fight,
+                self.ai_data.flee,
+                self.ai_data.alarm,
+                as_flags!(self.ai_data.services),
                 as_option!(self.sound),
                 self.scale,
-                as_json!(self.creature_flags),
+                as_flags!(self.creature_flags),
                 self.blood_type,
                 as_enum!(self.data.creature_type),
                 self.data.level,
@@ -353,5 +356,37 @@ impl SqlInfo for Creature {
                 self.data.gold,
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for (idx, item_id) in &self.inventory {
+                let join = InventoryJoin {
+                    index: *idx,
+                    item_id: item_id.to_string(),
+                };
+                join.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
+            }
+            Ok(0)
+        })
+        .and_then(|_| {
+            for spell_id in &self.spells {
+                let join = SpellJoin {
+                    spell_id: spell_id.clone(),
+                };
+                join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
+            }
+            Ok(1)
+        })
+        .and_then(|_| {
+            for dest in &self.travel_destinations {
+                dest.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
+            }
+            Ok(1)
+        })
+        .and_then(|_| {
+            for package in &self.ai_packages {
+                package.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
+            }
+            Ok(1)
+        })
     }
 }

@@ -178,12 +178,17 @@ impl SqlInfo for Faction {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("rank_names", "TEXT"),         //array
-            ("reactions", "TEXT"),          //array
-            ("favored_attributes", "TEXT"), //fixed array
-            ("requirements", "TEXT"),       //fixed array
-            ("favored_skills", "TEXT"),     //fixed array
-            ("flags", "TEXT"),              //flags
+            ("rank_names", "TEXT"),           //format
+            ("favored_attributes_1", "TEXT"), //enum
+            ("favored_attributes_2", "TEXT"), //enum
+            ("favored_skills_1", "TEXT"),     //enum
+            ("favored_skills_2", "TEXT"),     //enum
+            ("favored_skills_3", "TEXT"),     //enum
+            ("favored_skills_4", "TEXT"),     //enum
+            ("favored_skills_5", "TEXT"),     //enum
+            ("favored_skills_6", "TEXT"),     //enum
+            ("favored_skills_7", "TEXT"),     //enum
+            ("flags", "TEXT"),                //flags
         ]
     }
 
@@ -194,14 +199,32 @@ impl SqlInfo for Faction {
             sql.as_str(),
             params![
                 self.name,
-                as_json!(self.rank_names),
-                as_json!(self.reactions),
-                as_json!(self.data.favored_attributes),
-                as_json!(self.data.requirements),
-                as_json!(self.data.favored_skills),
+                as_sql!(self.rank_names),
+                as_enum!(self.data.favored_attributes[0]),
+                as_enum!(self.data.favored_attributes[1]),
+                as_enum!(self.data.favored_skills[0]),
+                as_enum!(self.data.favored_skills[1]),
+                as_enum!(self.data.favored_skills[2]),
+                as_enum!(self.data.favored_skills[3]),
+                as_enum!(self.data.favored_skills[4]),
+                as_enum!(self.data.favored_skills[5]),
+                as_enum!(self.data.favored_skills[6]),
                 as_flags!(self.data.flags)
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for reaction in &self.reactions {
+                reaction.table_insert(db, mod_name, &[&self.editor_id()])?;
+            }
+            Ok(0)
+        })
+        .and_then(|_| {
+            for requirement in &self.data.requirements {
+                requirement.table_insert(db, mod_name, &[&self.editor_id()])?;
+            }
+            Ok(0)
+        })
     }
 }
 impl Faction {}

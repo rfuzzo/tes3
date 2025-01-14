@@ -189,7 +189,7 @@ impl SqlInfo for Race {
                 as_sql!(self.data.luck),
                 as_sql!(self.data.height),
                 as_sql!(self.data.weight),
-                as_json!(self.data.flags),
+                as_flags!(self.data.flags),
             ],
         )
         // join tables
@@ -198,9 +198,7 @@ impl SqlInfo for Race {
                 let join = SpellJoin {
                     spell_id: spell_id.clone(),
                 };
-
-                let links: [&dyn ToSql; 2] = [&self.editor_id(), &Null];
-                join.table_insert(db, mod_name, &links)?;
+                join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null, &Null])?;
             }
             Ok(1)
         })

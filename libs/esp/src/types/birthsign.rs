@@ -106,9 +106,7 @@ impl SqlInfo for Birthsign {
                     let join = SpellJoin {
                         spell_id: spell_id.clone(),
                     };
-
-                    let links: [&dyn ToSql; 2] = [&Null, &self.editor_id()];
-                    join.table_insert(db, mod_name, &links)?;
+                    join.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null, &Null])?;
                 }
                 Ok(1)
             })

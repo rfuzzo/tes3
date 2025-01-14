@@ -109,16 +109,23 @@ impl SqlInfo for LeveledItem {
         vec![
             ("leveled_item_flags", "TEXT"), //flags
             ("chance_none", "INTEGER"),
-            ("items", "TEXT"), //array
         ]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         let sql = as_tes3.table_insert_text(mod_name);
-        db.execute(
-            sql.as_str(),
-            params![as_json!(self.leveled_item_flags), self.chance_none, as_json!(self.items)],
-        )
+        db.execute(sql.as_str(), params![as_flags!(self.leveled_item_flags), self.chance_none])
+            // join tables
+            .and_then(|_| {
+                for (item_id, probability) in &self.items {
+                    let join = ItemJoin {
+                        item_id: item_id.to_string(),
+                        probability: probability.to_owned(),
+                    };
+                    join.table_insert(db, mod_name, &[&self.editor_id()])?;
+                }
+                Ok(0)
+            })
     }
 }

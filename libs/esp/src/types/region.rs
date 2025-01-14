@@ -173,7 +173,6 @@ impl SqlInfo for Region {
             ("blizzard", "INTEGER"),
             ("sleep_creature", "TEXT"),
             ("map_color", "TEXT"), // color
-            ("sounds", "TEXT"),    // array
         ]
     }
 
@@ -195,7 +194,7 @@ impl SqlInfo for Region {
                 self.weather_chances.snow,
                 self.weather_chances.blizzard,
                 self.sleep_creature,
-                as_json!(self.map_color),
+                as_color!(self.map_color),
             ],
         )
         // join tables

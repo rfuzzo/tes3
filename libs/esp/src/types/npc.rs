@@ -365,24 +365,33 @@ impl SqlInfo for Npc {
             ("name", "TEXT"),
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
-            ("inventory", "TEXT"),           //array
-            ("spells", "TEXT"),              //array
-            ("ai_data", "TEXT"),             //json
-            ("ai_packages", "TEXT"),         //array
-            ("travel_destinations", "TEXT"), //array
-            ("race", "TEXT"),                //FK
-            ("class", "TEXT"),               //FK
-            ("faction", "TEXT"),             //FK
-            ("head", "TEXT"),                //FK
-            ("hair", "TEXT"),                //FK
-            ("npc_flags", "TEXT"),           //flags
+            // ai data
+            ("hello", "INTEGER"),
+            ("fight", "INTEGER"),
+            ("flee", "INTEGER"),
+            ("alarm", "INTEGER"),
+            ("services", "INTEGER"), // flags
+            //
+            ("race", "TEXT"),      //FK
+            ("class", "TEXT"),     //FK
+            ("faction", "TEXT"),   //FK
+            ("head", "TEXT"),      //FK
+            ("hair", "TEXT"),      //FK
+            ("npc_flags", "TEXT"), //flags
             ("blood_type", "INTEGER"),
-            ("data_level", "INTEGER"),
-            ("data_stats", "TEXT"), //json
-            ("data_disposition", "INTEGER"),
-            ("data_reputation", "INTEGER"),
-            ("data_rank", "INTEGER"),
-            ("data_gold", "INTEGER"),
+            // data
+            ("level", "INTEGER"),
+            // stats
+            ("attributes", "TEXT"), //json
+            ("skills", "TEXT"),     //json
+            ("health", "INTEGER"),
+            ("magicka", "INTEGER"),
+            ("fatigue", "INTEGER"),
+            //
+            ("disposition", "INTEGER"),
+            ("reputation", "INTEGER"),
+            ("rank", "INTEGER"),
+            ("gold", "INTEGER"),
         ]
     }
 
@@ -406,25 +415,66 @@ impl SqlInfo for Npc {
                 self.name,
                 as_option!(self.script),
                 self.mesh,
-                as_json!(self.inventory),
-                as_json!(self.spells),
-                as_json!(self.ai_data),
-                as_json!(self.ai_packages),
-                as_json!(self.travel_destinations),
+                //
+                self.ai_data.hello,
+                self.ai_data.fight,
+                self.ai_data.flee,
+                self.ai_data.alarm,
+                as_flags!(self.ai_data.services),
+                //
                 as_option!(self.race),
                 as_option!(self.class),
                 as_option!(self.faction),
                 as_option!(self.head.to_lowercase()), //thanks todd
                 as_option!(self.hair.to_lowercase()), //thanks todd
-                as_json!(self.npc_flags),
+                as_flags!(self.npc_flags),
                 self.blood_type,
+                //
                 self.data.level,
-                as_json!(self.data.stats),
+                //
+                self.data.stats.as_ref().map(|x| as_json!(x.attributes)),
+                self.data.stats.as_ref().map(|x| as_json!(x.skills)),
+                self.data.stats.as_ref().map(|x| x.health),
+                self.data.stats.as_ref().map(|x| x.magicka),
+                self.data.stats.as_ref().map(|x| x.fatigue),
+                //
                 self.data.disposition,
                 self.data.reputation,
                 self.data.rank,
                 self.data.gold
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for (idx, item_id) in &self.inventory {
+                let join = InventoryJoin {
+                    index: *idx,
+                    item_id: item_id.to_string(),
+                };
+                join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id()])?;
+            }
+            Ok(0)
+        })
+        .and_then(|_| {
+            for spell_id in &self.spells {
+                let join = SpellJoin {
+                    spell_id: spell_id.clone(),
+                };
+                join.table_insert(db, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
+            }
+            Ok(1)
+        })
+        .and_then(|_| {
+            for dest in &self.travel_destinations {
+                dest.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
+            }
+            Ok(1)
+        })
+        .and_then(|_| {
+            for package in &self.ai_packages {
+                package.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
+            }
+            Ok(1)
+        })
     }
 }

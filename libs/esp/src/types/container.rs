@@ -132,7 +132,7 @@ impl SqlInfo for Container {
                 as_option!(self.script),
                 self.mesh,
                 self.encumbrance,
-                as_json!(self.container_flags),
+                as_flags!(self.container_flags),
             ],
         )
         // join tables
@@ -142,8 +142,7 @@ impl SqlInfo for Container {
                     index: *idx,
                     item_id: item_id.to_string(),
                 };
-                let links: [&dyn ToSql; 1] = [&self.editor_id()];
-                join.table_insert(db, mod_name, &links)?;
+                join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
             }
             Ok(0)
         })

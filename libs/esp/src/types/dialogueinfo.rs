@@ -363,7 +363,6 @@ impl SqlInfo for DialogueInfo {
             ("sound_path", "TEXT"),
             ("text", "TEXT"),
             ("quest_state", "TEXT"), //enum
-            ("filters", "TEXT"),     //array
             ("script_text", "TEXT"),
         ]
     }
@@ -403,9 +402,15 @@ impl SqlInfo for DialogueInfo {
                 self.sound_path,
                 self.text,
                 as_enum!(self.quest_state),
-                as_json!(self.filters),
                 self.script_text,
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for filter in &self.filters {
+                filter.table_insert(db, mod_name, &[&self.editor_id()])?;
+            }
+            Ok(1)
+        })
     }
 }

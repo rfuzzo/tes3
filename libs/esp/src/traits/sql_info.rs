@@ -1,7 +1,15 @@
 use crate::prelude::*;
 
+// todo sql
+// check foreign keys in join tables
+// check unique constraints in join tables
+// check foreign keys ids (tolower)
+// check foreign keys in values
+//   in tes3 they can be "", which is just Null, we use as_option! to convert them
+// todo sql color representation
+
 #[macro_export]
-macro_rules! as_json {
+macro_rules! as_color {
     ( $x:expr ) => {
         serde_json::to_string_pretty(&$x).unwrap()
     };
@@ -15,6 +23,13 @@ macro_rules! as_option {
         } else {
             Some($x.to_owned())
         }
+    };
+}
+
+#[macro_export]
+macro_rules! as_json {
+    ( $x:expr ) => {
+        serde_json::to_string_pretty(&$x).unwrap()
     };
 }
 

@@ -114,9 +114,18 @@ impl SqlInfo for Ingredient {
             ("icon", "TEXT"),
             ("weight", "REAL"),
             ("value", "INTEGER"),
-            ("effects", "TEXT"),    //array
-            ("skills", "TEXT"),     //array
-            ("attributes", "TEXT"), //array
+            ("effects_1", "TEXT"),
+            ("effects_2", "TEXT"),
+            ("effects_3", "TEXT"),
+            ("effects_4", "TEXT"),
+            ("skills_1", "TEXT"),
+            ("skills_2", "TEXT"),
+            ("skills_3", "TEXT"),
+            ("skills_4", "TEXT"),
+            ("attributes_1", "TEXT"),
+            ("attributes_2", "TEXT"),
+            ("attributes_3", "TEXT"),
+            ("attributes_4", "TEXT"),
         ]
     }
 
@@ -136,9 +145,18 @@ impl SqlInfo for Ingredient {
                 self.icon,
                 self.data.weight,
                 self.data.value,
-                as_json!(self.data.effects),
-                as_json!(self.data.skills),
-                as_json!(self.data.attributes),
+                as_enum!(self.data.effects[0]),
+                as_enum!(self.data.effects[1]),
+                as_enum!(self.data.effects[2]),
+                as_enum!(self.data.effects[3]),
+                as_enum!(self.data.skills[0]),
+                as_enum!(self.data.skills[1]),
+                as_enum!(self.data.skills[2]),
+                as_enum!(self.data.skills[3]),
+                as_enum!(self.data.attributes[0]),
+                as_enum!(self.data.attributes[1]),
+                as_enum!(self.data.attributes[2]),
+                as_enum!(self.data.attributes[3])
             ],
         )
     }

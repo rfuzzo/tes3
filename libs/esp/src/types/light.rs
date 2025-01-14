@@ -127,8 +127,8 @@ impl SqlInfo for Light {
             ("value", "INTEGER"),
             ("time", "INTEGER"),
             ("radius", "INTEGER"),
-            ("color", "BLOB"), // todo color
-            ("flags", "TEXT"), //flags
+            ("color", "TEXT"), // color
+            ("flags", "TEXT"), // flags
         ]
     }
 
@@ -154,8 +154,8 @@ impl SqlInfo for Light {
                 self.data.value,
                 self.data.time,
                 self.data.radius,
-                self.data.color,
-                as_json!(self.flags),
+                as_color!(self.data.color),
+                as_flags!(self.data.flags),
             ],
         )
     }

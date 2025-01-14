@@ -110,47 +110,47 @@ pub use weapon::*;
 #[esp_meta]
 #[derive(TES3Object, Clone, Debug, From, PartialEq)]
 pub enum TES3Object {
-    #[tag("TES3")] Header(Header),
+    #[tag("TES3")] Header(Header),                      // incomplete, values
     #[tag("GMST")] GameSetting(GameSetting),            // done
     #[tag("GLOB")] GlobalVariable(GlobalVariable),      // done
     #[tag("CLAS")] Class(Class),                        // done
-    #[tag("FACT")] Faction(Faction),
+    #[tag("FACT")] Faction(Faction),                    // done
     #[tag("RACE")] Race(Race),                          // done
     #[tag("SOUN")] Sound(Sound),                        // done
     #[tag("SNDG")] SoundGen(SoundGen),                  // done
     #[tag("SKIL")] Skill(Skill),                        // done
-    #[tag("MGEF")] MagicEffect(MagicEffect),            // color
-    #[tag("SCPT")] Script(Script),                      // incomplete
-    #[tag("REGN")] Region(Region),                      // color
+    #[tag("MGEF")] MagicEffect(MagicEffect),            // done
+    #[tag("SCPT")] Script(Script),                      // incomplete, values
+    #[tag("REGN")] Region(Region),                      // done
     #[tag("BSGN")] Birthsign(Birthsign),                // done
     #[tag("SSCR")] StartScript(StartScript),            // done
     #[tag("LTEX")] LandscapeTexture(LandscapeTexture),  // done
     #[tag("SPEL")] Spell(Spell),                        // done
     #[tag("STAT")] Static(Static),                      // done
-    #[tag("DOOR")] Door(Door),          // done
-    #[tag("MISC")] MiscItem(MiscItem),  // done
-    #[tag("WEAP")] Weapon(Weapon),      // done
-    #[tag("CONT")] Container(Container),// done
-    #[tag("CREA")] Creature(Creature),
-    #[tag("BODY")] Bodypart(Bodypart),  // done
-    #[tag("LIGH")] Light(Light),        // color
-    #[tag("ENCH")] Enchanting(Enchanting),  // done
-    #[tag("NPC_")] Npc(Npc),
-    #[tag("ARMO")] Armor(Armor),            // done
-    #[tag("CLOT")] Clothing(Clothing),
-    #[tag("REPA")] RepairItem(RepairItem),
-    #[tag("ACTI")] Activator(Activator),
-    #[tag("APPA")] Apparatus(Apparatus),
-    #[tag("LOCK")] Lockpick(Lockpick),
-    #[tag("PROB")] Probe(Probe),
-    #[tag("INGR")] Ingredient(Ingredient),
-    #[tag("BOOK")] Book(Book),
-    #[tag("ALCH")] Alchemy(Alchemy),
-    #[tag("LEVI")] LeveledItem(LeveledItem),
-    #[tag("LEVC")] LeveledCreature(LeveledCreature),
-    #[tag("CELL")] Cell(Cell),
-    #[tag("LAND")] Landscape(Landscape),
-    #[tag("PGRD")] PathGrid(PathGrid),
-    #[tag("DIAL")] Dialogue(Dialogue),
-    #[tag("INFO")] DialogueInfo(DialogueInfo),
+    #[tag("DOOR")] Door(Door),                          // done
+    #[tag("MISC")] MiscItem(MiscItem),                  // done
+    #[tag("WEAP")] Weapon(Weapon),                      // done
+    #[tag("CONT")] Container(Container),                // done
+    #[tag("CREA")] Creature(Creature),                  // done
+    #[tag("BODY")] Bodypart(Bodypart),                  // done
+    #[tag("LIGH")] Light(Light),                        // done
+    #[tag("ENCH")] Enchanting(Enchanting),              // done
+    #[tag("NPC_")] Npc(Npc),                            // done
+    #[tag("ARMO")] Armor(Armor),                        // done
+    #[tag("CLOT")] Clothing(Clothing),                  // done
+    #[tag("REPA")] RepairItem(RepairItem),              // done
+    #[tag("ACTI")] Activator(Activator),                // done
+    #[tag("APPA")] Apparatus(Apparatus),                // done
+    #[tag("LOCK")] Lockpick(Lockpick),                  // done
+    #[tag("PROB")] Probe(Probe),                        // done
+    #[tag("INGR")] Ingredient(Ingredient),              // done
+    #[tag("BOOK")] Book(Book),                          // done
+    #[tag("ALCH")] Alchemy(Alchemy),                    // done
+    #[tag("LEVI")] LeveledItem(LeveledItem),            // done
+    #[tag("LEVC")] LeveledCreature(LeveledCreature),    // done
+    #[tag("CELL")] Cell(Cell),                          // done
+    #[tag("LAND")] Landscape(Landscape),                // incomplete, blobs
+    #[tag("PGRD")] PathGrid(PathGrid),                  // incomplete, blobs
+    #[tag("DIAL")] Dialogue(Dialogue),                  // done
+    #[tag("INFO")] DialogueInfo(DialogueInfo),          // done
 }

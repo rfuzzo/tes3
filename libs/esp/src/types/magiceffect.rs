@@ -190,7 +190,7 @@ impl SqlInfo for MagicEffect {
             ("school", "TEXT"), //enum
             ("base_cost", "REAL"),
             ("data_flags", "TEXT"), //flags
-            ("color", "TEXT"),      //json todo color
+            ("color", "TEXT"),      //color
             ("speed", "REAL"),
             ("size", "REAL"),
             ("size_cap", "REAL"),
@@ -226,8 +226,8 @@ impl SqlInfo for MagicEffect {
                 self.description,
                 as_enum!(self.data.school),
                 self.data.base_cost,
-                as_json!(self.data.flags),
-                as_json!(self.data.color),
+                as_flags!(self.data.flags),
+                as_color!(self.data.color),
                 self.data.speed,
                 self.data.size,
                 self.data.size_cap,

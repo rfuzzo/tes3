@@ -121,7 +121,6 @@ impl SqlInfo for Alchemy {
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("effects", "TEXT"), // array
             ("weight", "REAL"),
             ("value", "INTEGER"),
             ("data_flags", "TEXT"), // flags
@@ -142,11 +141,17 @@ impl SqlInfo for Alchemy {
                 as_option!(self.script),
                 self.mesh,
                 self.icon,
-                as_json!(self.effects),
                 self.data.weight,
                 self.data.value,
-                as_json!(self.data.flags)
+                as_flags!(self.data.flags)
             ],
         )
+        // join tables
+        .and_then(|_| {
+            for effect in &self.effects {
+                effect.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id()])?;
+            }
+            Ok(1)
+        })
     }
 }

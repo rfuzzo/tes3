@@ -132,6 +132,7 @@ impl SqlInfo for Book {
             ("icon", "TEXT"),
             ("enchanting", "TEXT"), //FK
             ("text", "TEXT"),
+            //
             ("weight", "REAL"),
             ("value", "INTEGER"),
             ("book_type", "TEXT"), //enum
@@ -159,6 +160,7 @@ impl SqlInfo for Book {
                 self.icon,
                 as_option!(self.enchanting),
                 self.text,
+                //
                 self.data.weight,
                 self.data.value,
                 as_enum!(self.data.book_type),

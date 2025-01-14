@@ -132,7 +132,7 @@ impl SqlInfo for MiscItem {
                 self.icon,
                 self.data.weight,
                 self.data.value,
-                as_json!(self.data.flags)
+                as_flags!(self.data.flags)
             ],
         )
     }

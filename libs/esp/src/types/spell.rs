@@ -106,14 +106,13 @@ impl SqlInfo for Spell {
                 self.name,
                 as_enum!(self.data.spell_type),
                 self.data.cost,
-                as_json!(self.data.flags),
+                as_flags!(self.data.flags),
             ],
         )
         // join tables
         .and_then(|_| {
             for effect in &self.effects {
-                let links: [&dyn ToSql; 2] = [&self.editor_id(), &Null];
-                effect.table_insert(db, mod_name, &links)?;
+                effect.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
             }
             Ok(1)
         })

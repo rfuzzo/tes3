@@ -109,7 +109,6 @@ impl SqlInfo for LeveledCreature {
         vec![
             ("leveled_creature_flags", "TEXT"), //flags
             ("chance_none", "INTEGER"),
-            ("creatures", "TEXT"), //array
         ]
     }
 
@@ -118,11 +117,18 @@ impl SqlInfo for LeveledCreature {
         let sql = as_tes3.table_insert_text(mod_name);
         db.execute(
             sql.as_str(),
-            params![
-                as_json!(self.leveled_creature_flags),
-                self.chance_none,
-                as_json!(self.creatures),
-            ],
+            params![as_flags!(self.leveled_creature_flags), self.chance_none,],
         )
+        // join tables
+        .and_then(|_| {
+            for (creature_id, probability) in &self.creatures {
+                let join = CreatureJoin {
+                    creature_id: creature_id.to_string(),
+                    probability: probability.to_owned(),
+                };
+                join.table_insert(db, mod_name, &[&self.editor_id()])?;
+            }
+            Ok(0)
+        })
     }
 }

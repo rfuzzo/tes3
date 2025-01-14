@@ -198,7 +198,7 @@ impl SqlInfo for Landscape {
             sql.as_str(),
             params![
                 as_sql!(self.grid),
-                as_json!(self.landscape_flags),
+                as_flags!(self.landscape_flags),
                 as_json!(self.texture_indices),
             ],
         )

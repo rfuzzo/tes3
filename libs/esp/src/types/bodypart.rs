@@ -114,8 +114,9 @@ impl Save for BodypartData {
 impl SqlInfo for Bodypart {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("race", "TEXT"),
+            ("race", "TEXT"), // FK
             ("mesh", "TEXT"),
+            //
             ("part", "TEXT"), //enum
             ("vampire", "INTEGER"),
             ("flags", "TEXT"),         //flags
@@ -133,11 +134,11 @@ impl SqlInfo for Bodypart {
         db.execute(
             sql.as_str(),
             params![
-                self.race,
+                as_option!(self.race),
                 self.mesh,
                 as_enum!(self.data.part),
                 self.data.vampire,
-                as_json!(self.flags),
+                as_flags!(self.data.flags),
                 as_enum!(self.data.bodypart_type)
             ],
         )

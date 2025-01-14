@@ -179,7 +179,7 @@ impl SqlInfo for Weapon {
                 self.data.slash_max,
                 self.data.thrust_min,
                 self.data.thrust_max,
-                as_json!(self.data.flags)
+                as_flags!(self.data.flags)
             ],
         )
     }

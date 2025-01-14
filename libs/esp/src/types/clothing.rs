@@ -128,7 +128,8 @@ impl SqlInfo for Clothing {
             ("script", "TEXT"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("enchanting", "TEXT"),    //FK
+            ("enchanting", "TEXT"), //FK
+            //
             ("clothing_type", "TEXT"), //enum
             ("weight", "REAL"),
             ("value", "INTEGER"),
@@ -154,6 +155,7 @@ impl SqlInfo for Clothing {
                 self.mesh,
                 self.icon,
                 as_option!(self.enchanting),
+                //
                 as_enum!(self.data.clothing_type),
                 self.data.weight,
                 self.data.value,

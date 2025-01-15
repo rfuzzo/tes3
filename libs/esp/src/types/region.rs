@@ -178,36 +178,35 @@ impl SqlInfo for Region {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(
-                db,
-                mod_name,
-                params![
-                    self.name,
-                    self.weather_chances.clear,
-                    self.weather_chances.cloudy,
-                    self.weather_chances.foggy,
-                    self.weather_chances.overcast,
-                    self.weather_chances.rain,
-                    self.weather_chances.thunder,
-                    self.weather_chances.ash,
-                    self.weather_chances.blight,
-                    self.weather_chances.snow,
-                    self.weather_chances.blizzard,
-                    self.sleep_creature,
-                    as_color!(self.map_color),
-                ],
-            )
-            // join tables
-            .and_then(|_| {
-                for (sound_id, _) in &self.sounds {
-                    let join = SoundJoin {
-                        sound_id: sound_id.to_string(),
-                    };
-                    let links: [&dyn ToSql; 1] = [&self.editor_id()];
-                    join.table_insert(db, mod_name, &links)?;
-                }
-                Ok(0)
-            })
+        as_tes3.table_insert2(
+            db,
+            mod_name,
+            params![
+                self.name,
+                self.weather_chances.clear,
+                self.weather_chances.cloudy,
+                self.weather_chances.foggy,
+                self.weather_chances.overcast,
+                self.weather_chances.rain,
+                self.weather_chances.thunder,
+                self.weather_chances.ash,
+                self.weather_chances.blight,
+                self.weather_chances.snow,
+                self.weather_chances.blizzard,
+                self.sleep_creature,
+                as_color!(self.map_color),
+            ],
+        )
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for (sound_id, _) in &self.sounds {
+            let join = SoundJoin {
+                sound_id: sound_id.to_string(),
+            };
+            let links: [&dyn ToSql; 1] = [&self.editor_id().to_lowercase()];
+            join.table_insert(db, mod_name, &links)?;
+        }
+        Ok(0)
     }
 }

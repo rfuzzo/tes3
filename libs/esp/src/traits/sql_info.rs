@@ -1,13 +1,5 @@
 use crate::prelude::*;
 
-// todo sql
-// check foreign keys in join tables
-// check unique constraints in join tables
-// check foreign keys ids (tolower)
-// check foreign keys in values
-//   in tes3 they can be "", which is just Null, we use as_option! to convert them
-// todo sql color representation
-
 #[macro_export]
 macro_rules! as_color {
     ( $x:expr ) => {
@@ -21,7 +13,7 @@ macro_rules! as_option {
         if $x.is_empty() {
             None
         } else {
-            Some($x.to_owned())
+            Some($x.to_lowercase().to_owned())
         }
     };
 }
@@ -73,6 +65,9 @@ pub trait SqlInfo {
         vec![]
     }
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize>;
+    fn join_table_insert(&self, _db: &Connection, _mod_name: &str) -> rusqlite::Result<usize> {
+        Ok(0)
+    }
 }
 
 pub trait SqlJoinInfo {
@@ -151,6 +146,14 @@ impl SqlInfo for TES3Object {
         delegate! {
             match self {
                 inner => inner.table_insert(db, mod_name)
+            }
+        }
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        delegate! {
+            match self {
+                inner => inner.join_table_insert(db, mod_name)
             }
         }
     }

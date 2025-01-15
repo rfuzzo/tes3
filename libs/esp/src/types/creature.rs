@@ -314,80 +314,73 @@ impl SqlInfo for Creature {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(
-                db,
-                mod_name,
-                params![
-                    self.name,
-                    as_option!(self.script),
-                    self.mesh,
-                    self.ai_data.hello,
-                    self.ai_data.fight,
-                    self.ai_data.flee,
-                    self.ai_data.alarm,
-                    as_flags!(self.ai_data.services),
-                    as_option!(self.sound),
-                    self.scale,
-                    as_flags!(self.creature_flags),
-                    self.blood_type,
-                    as_enum!(self.data.creature_type),
-                    self.data.level,
-                    self.data.strength,
-                    self.data.intelligence,
-                    self.data.willpower,
-                    self.data.agility,
-                    self.data.speed,
-                    self.data.endurance,
-                    self.data.personality,
-                    self.data.luck,
-                    self.data.health,
-                    self.data.magicka,
-                    self.data.fatigue,
-                    self.data.soul,
-                    self.data.combat,
-                    self.data.magic,
-                    self.data.stealth,
-                    self.data.attack1.0,
-                    self.data.attack1.1,
-                    self.data.attack2.0,
-                    self.data.attack2.1,
-                    self.data.attack3.0,
-                    self.data.attack3.1,
-                    self.data.gold,
-                ],
-            )
-            // join tables
-            .and_then(|_| {
-                for (idx, item_id) in &self.inventory {
-                    let join = InventoryJoin {
-                        index: *idx,
-                        item_id: item_id.to_string(),
-                    };
-                    join.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
-                }
-                Ok(0)
-            })
-            .and_then(|_| {
-                for spell_id in &self.spells {
-                    let join = SpellJoin {
-                        spell_id: spell_id.clone(),
-                    };
-                    join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
-                }
-                Ok(1)
-            })
-            .and_then(|_| {
-                for dest in &self.travel_destinations {
-                    dest.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
-                }
-                Ok(1)
-            })
-            .and_then(|_| {
-                for package in &self.ai_packages {
-                    package.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
-                }
-                Ok(1)
-            })
+        as_tes3.table_insert2(
+            db,
+            mod_name,
+            params![
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.ai_data.hello,
+                self.ai_data.fight,
+                self.ai_data.flee,
+                self.ai_data.alarm,
+                as_flags!(self.ai_data.services),
+                as_option!(self.sound),
+                self.scale,
+                as_flags!(self.creature_flags),
+                self.blood_type,
+                as_enum!(self.data.creature_type),
+                self.data.level,
+                self.data.strength,
+                self.data.intelligence,
+                self.data.willpower,
+                self.data.agility,
+                self.data.speed,
+                self.data.endurance,
+                self.data.personality,
+                self.data.luck,
+                self.data.health,
+                self.data.magicka,
+                self.data.fatigue,
+                self.data.soul,
+                self.data.combat,
+                self.data.magic,
+                self.data.stealth,
+                self.data.attack1.0,
+                self.data.attack1.1,
+                self.data.attack2.0,
+                self.data.attack2.1,
+                self.data.attack3.0,
+                self.data.attack3.1,
+                self.data.gold,
+            ],
+        )
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for (idx, item_id) in &self.inventory {
+            let join = InventoryJoin {
+                index: *idx,
+                item_id: item_id.to_string(),
+            };
+            join.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase(), &Null])?;
+        }
+
+        for spell_id in &self.spells {
+            let join = SpellJoin {
+                spell_id: spell_id.clone(),
+            };
+            join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id().to_lowercase(), &Null])?;
+        }
+
+        for dest in &self.travel_destinations {
+            dest.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null])?;
+        }
+
+        for package in &self.ai_packages {
+            package.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null])?;
+        }
+        Ok(0)
     }
 }

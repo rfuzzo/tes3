@@ -91,23 +91,22 @@ impl SqlInfo for Enchanting {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(
-                db,
-                mod_name,
-                params![
-                    as_enum!(self.data.enchant_type),
-                    self.data.cost,
-                    self.data.max_charge,
-                    as_flags!(self.data.flags),
-                ],
-            )
-            // join tables
-            .and_then(|_| {
-                for effect in &self.effects {
-                    effect.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
-                }
-                Ok(1)
-            })
+        as_tes3.table_insert2(
+            db,
+            mod_name,
+            params![
+                as_enum!(self.data.enchant_type),
+                self.data.cost,
+                self.data.max_charge,
+                as_flags!(self.data.flags),
+            ],
+        )
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for effect in &self.effects {
+            effect.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase(), &Null])?;
+        }
+        Ok(0)
     }
 }

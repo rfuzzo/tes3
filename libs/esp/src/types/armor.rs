@@ -149,30 +149,29 @@ impl SqlInfo for Armor {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(
-                db,
-                mod_name,
-                params![
-                    self.name,
-                    as_option!(self.script),
-                    self.mesh,
-                    self.icon,
-                    as_option!(self.enchanting),
-                    as_enum!(self.data.armor_type),
-                    self.data.weight,
-                    self.data.value,
-                    self.data.health,
-                    self.data.enchantment,
-                    self.data.armor_rating,
-                ],
-            )
-            // join tables
-            .and_then(|_| {
-                for biped_object in &self.biped_objects {
-                    biped_object.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
-                }
-                Ok(1)
-            })
+        as_tes3.table_insert2(
+            db,
+            mod_name,
+            params![
+                self.name,
+                as_option!(self.script),
+                self.mesh,
+                self.icon,
+                as_option!(self.enchanting),
+                as_enum!(self.data.armor_type),
+                self.data.weight,
+                self.data.value,
+                self.data.health,
+                self.data.enchantment,
+                self.data.armor_rating,
+            ],
+        )
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for biped_object in &self.biped_objects {
+            biped_object.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null])?;
+        }
+        Ok(1)
     }
 }

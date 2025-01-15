@@ -98,17 +98,16 @@ impl SqlInfo for Birthsign {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(db, mod_name, params![self.name, self.texture, self.description])
-            // join tables
-            .and_then(|_| {
-                for spell_id in &self.spells {
-                    let join = SpellJoin {
-                        spell_id: spell_id.clone(),
-                    };
-                    join.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null, &Null])?;
-                }
-                Ok(1)
-            })
+        as_tes3.table_insert2(db, mod_name, params![self.name, self.texture, self.description])
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for spell_id in &self.spells {
+            let join = SpellJoin {
+                spell_id: spell_id.clone(),
+            };
+            join.table_insert(db, mod_name, params![&Null, &self.editor_id().to_lowercase(), &Null, &Null])?;
+        }
+        Ok(0)
     }
 }

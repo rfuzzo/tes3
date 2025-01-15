@@ -292,32 +292,34 @@ impl SqlInfo for Cell {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(
-                db,
-                mod_name,
-                params![
-                    self.name,
-                    //
-                    as_flags!(self.data.flags),
-                    as_sql!(self.data.grid),
-                    //
-                    self.region,
-                    as_color!(self.map_color),
-                    self.water_height,
-                    //
-                    as_color!(self.atmosphere_data.as_ref().map(|x| x.ambient_color)),
-                    as_color!(self.atmosphere_data.as_ref().map(|x| x.sunlight_color)),
-                    as_color!(self.atmosphere_data.as_ref().map(|x| x.fog_color)),
-                    self.atmosphere_data.as_ref().map(|x| x.fog_density),
-                ],
-            )
-            // join tables
-            .and_then(|_| {
-                for (grid, reference) in &self.references {
-                    reference.table_insert(db, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
-                }
-                Ok(0)
-            })
+
+        let region_str = if let Some(region) = &self.region { region } else { "" };
+
+        as_tes3.table_insert2(
+            db,
+            mod_name,
+            params![
+                self.name,
+                //
+                as_flags!(self.data.flags),
+                as_sql!(self.data.grid),
+                //
+                as_option!(region_str),
+                as_color!(self.map_color),
+                self.water_height,
+                //
+                as_color!(self.atmosphere_data.as_ref().map(|x| x.ambient_color)),
+                as_color!(self.atmosphere_data.as_ref().map(|x| x.sunlight_color)),
+                as_color!(self.atmosphere_data.as_ref().map(|x| x.fog_color)),
+                self.atmosphere_data.as_ref().map(|x| x.fog_density),
+            ],
+        )
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for (grid, reference) in &self.references {
+            reference.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &as_sql!(grid)])?;
+        }
+        Ok(0)
     }
 }

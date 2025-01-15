@@ -100,23 +100,22 @@ impl SqlInfo for Spell {
 
     fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3
-            .table_insert2(
-                db,
-                mod_name,
-                params![
-                    self.name,
-                    as_enum!(self.data.spell_type),
-                    self.data.cost,
-                    as_flags!(self.data.flags),
-                ],
-            )
-            // join tables
-            .and_then(|_| {
-                for effect in &self.effects {
-                    effect.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
-                }
-                Ok(1)
-            })
+        as_tes3.table_insert2(
+            db,
+            mod_name,
+            params![
+                self.name,
+                as_enum!(self.data.spell_type),
+                self.data.cost,
+                as_flags!(self.data.flags),
+            ],
+        )
+    }
+
+    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+        for effect in &self.effects {
+            effect.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null, &Null])?;
+        }
+        Ok(1)
     }
 }

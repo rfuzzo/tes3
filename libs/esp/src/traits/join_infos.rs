@@ -7,7 +7,7 @@ pub struct SpellJoin {
 }
 impl SqlJoinInfo for SpellJoin {
     fn table_name(&self) -> &'static str {
-        "JOIN_SPELLS"
+        "JOIN_Spells"
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
@@ -22,10 +22,10 @@ impl SqlJoinInfo for SpellJoin {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("race_id", "TEXT NOT NULL"), //FK
-            ("bsgn_id", "TEXT NOT NULL"), //FK
-            ("crea_id", "TEXT NOT NULL"), //FK
-            ("npc_id", "TEXT NOT NULL"),  //FK
+            ("race_id", "TEXT"), //FK
+            ("bsgn_id", "TEXT"), //FK
+            ("crea_id", "TEXT"), //FK
+            ("npc_id", "TEXT"),  //FK
             // this
             ("spell_id", "TEXT"), //FK
         ]
@@ -43,7 +43,7 @@ pub struct SoundJoin {
 }
 impl SqlJoinInfo for SoundJoin {
     fn table_name(&self) -> &'static str {
-        "JOIN_SOUNDS"
+        "JOIN_Sounds"
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
@@ -53,7 +53,7 @@ impl SqlJoinInfo for SoundJoin {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("regn_id", "TEXT NOT NULL"), //FK
+            ("regn_id", "TEXT"), //FK
             // this
             ("sound_id", "TEXT"), //FK
         ]
@@ -72,23 +72,23 @@ pub struct InventoryJoin {
 }
 impl SqlJoinInfo for InventoryJoin {
     fn table_name(&self) -> &'static str {
-        "JOIN_INVENTORY"
+        "JOIN_Inventory"
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(cont_id) REFERENCES CONT(id)",
             "FOREIGN KEY(crea_id) REFERENCES CREA(id)",
-            "FOREIGN KEY(npc_id) REFERENCES NOC_(id)",
+            "FOREIGN KEY(npc_id) REFERENCES NPC_(id)",
         ]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("cont_id", "TEXT NOT NULL"), //FK
-            ("crea_id", "TEXT NOT NULL"), //FK
-            ("npc_id", "TEXT NOT NULL"),  //FK
+            ("cont_id", "TEXT"), //FK
+            ("crea_id", "TEXT"), //FK
+            ("npc_id", "TEXT"),  //FK
             // this
             ("idx", "INTEGER"),
             ("item_id", "TEXT"), //FK
@@ -118,7 +118,7 @@ impl SqlJoinInfo for ItemJoin {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("levi_id", "TEXT NOT NULL"), //FK
+            ("levi_id", "TEXT"), //FK
             // this
             ("item_id", "TEXT"), //FK
             ("probability", "INTEGER"),
@@ -148,7 +148,7 @@ impl SqlJoinInfo for CreatureJoin {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("levc_id", "TEXT NOT NULL"), //FK
+            ("levc_id", "TEXT"), //FK
             // this
             ("creature_id", "TEXT"), //FK
             ("probability", "INTEGER"),
@@ -176,8 +176,8 @@ impl SqlJoinInfo for TravelDestination {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("crea_id", "TEXT NOT NULL"), //FK
-            ("npc_id", "TEXT NOT NULL"),  //FK
+            ("crea_id", "TEXT"), //FK
+            ("npc_id", "TEXT"),  //FK
             // this
             ("translation", "TEXT"),
             ("rotation", "TEXT"),
@@ -216,8 +216,8 @@ impl SqlJoinInfo for AiPackage {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("crea_id", "TEXT NOT NULL"), //FK
-            ("npc_id", "TEXT NOT NULL"),  //FK
+            ("crea_id", "TEXT"), //FK
+            ("npc_id", "TEXT"),  //FK
             // this
             ("package", "TEXT"), //json TODO
         ]
@@ -242,7 +242,7 @@ impl SqlJoinInfo for Filter {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("info_id", "TEXT NOT NULL"), //FK
+            ("info_id", "TEXT"), //FK
             // this
             ("idx", "INTEGER"),
             ("filter_type", "TEXT"), //enum
@@ -283,7 +283,7 @@ impl SqlJoinInfo for FactionReaction {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("fact_id", "TEXT NOT NULL"), //FK
+            ("fact_id", "TEXT"), //FK
             // this
             ("faction", "TEXT"), //FK
             ("reaction", "INTEGER"),
@@ -308,7 +308,7 @@ impl SqlJoinInfo for FactionRequirement {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             // parents
-            ("fact_id", "TEXT NOT NULL"), //FK
+            ("fact_id", "TEXT"), //FK
             // this
             ("attributes", "TEXT"), //format
             ("primary_skill", "INTEGER"),

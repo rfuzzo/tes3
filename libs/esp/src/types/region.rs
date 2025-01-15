@@ -202,7 +202,7 @@ impl SqlInfo for Region {
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for (sound_id, _) in &self.sounds {
             let join = SoundJoin {
-                sound_id: sound_id.to_string(),
+                sound_id: sound_id.to_string().to_lowercase(),
             };
             let links: [&dyn ToSql; 1] = [&self.editor_id().to_lowercase()];
             join.table_insert(db, mod_name, &links)?;

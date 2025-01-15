@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 // used in RACE, BSGN, CREA, NPC_
+// depends on SPEL
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct SpellJoin {
     pub spell_id: String,
@@ -16,6 +17,8 @@ impl SqlJoinInfo for SpellJoin {
             "FOREIGN KEY(bsgn_id) REFERENCES BSGN(id)",
             "FOREIGN KEY(crea_id) REFERENCES CREA(id)",
             "FOREIGN KEY(npc_id) REFERENCES NPC_(id)",
+            //
+            "FOREIGN KEY(spell_id) REFERENCES SPEL(id)",
         ]
     }
 
@@ -37,6 +40,7 @@ impl SqlJoinInfo for SpellJoin {
 }
 
 // used in REGN
+// depends on SOUN
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct SoundJoin {
     pub sound_id: String,
@@ -47,7 +51,11 @@ impl SqlJoinInfo for SoundJoin {
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(regn_id) REFERENCES REGN(id)"]
+        vec![
+            "FOREIGN KEY(regn_id) REFERENCES REGN(id)",
+            //
+            "FOREIGN KEY(sound_id) REFERENCES SOUN(id)",
+        ]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -91,7 +99,7 @@ impl SqlJoinInfo for InventoryJoin {
             ("npc_id", "TEXT"),  //FK
             // this
             ("idx", "INTEGER"),
-            ("item_id", "TEXT"), //FK
+            ("item_id", "TEXT"), //FK TODO
         ]
     }
 
@@ -120,7 +128,7 @@ impl SqlJoinInfo for ItemJoin {
             // parents
             ("levi_id", "TEXT"), //FK
             // this
-            ("item_id", "TEXT"), //FK
+            ("item_id", "TEXT"), //FK TODO
             ("probability", "INTEGER"),
         ]
     }
@@ -131,6 +139,7 @@ impl SqlJoinInfo for ItemJoin {
 }
 
 // used in LEVC
+// depends on CREA or NPC_ //TODO
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct CreatureJoin {
     pub creature_id: String,
@@ -142,7 +151,11 @@ impl SqlJoinInfo for CreatureJoin {
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(levc_id) REFERENCES LEVC(id)"]
+        vec![
+            "FOREIGN KEY(levc_id) REFERENCES LEVC(id)",
+            //
+            "FOREIGN KEY(creature_id) REFERENCES CREA(id)",
+        ]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -181,7 +194,7 @@ impl SqlJoinInfo for TravelDestination {
             // this
             ("translation", "TEXT"),
             ("rotation", "TEXT"),
-            ("cell", "TEXT"), //FK
+            ("cell", "TEXT"), //FK TODO
         ]
     }
 
@@ -271,13 +284,18 @@ impl SqlJoinInfo for Filter {
 }
 
 // used in FACT
+// depends on FACT
 impl SqlJoinInfo for FactionReaction {
     fn table_name(&self) -> &'static str {
         "JOIN_FactionReaction"
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(fact_id) REFERENCES FACT(id)"]
+        vec![
+            "FOREIGN KEY(fact_id) REFERENCES FACT(id)",
+            //
+            "FOREIGN KEY(faction) REFERENCES FACT(id)",
+        ]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -291,7 +309,7 @@ impl SqlJoinInfo for FactionReaction {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], self.faction, self.reaction])
+        self.table_insert2(db, mod_name, params![links[0], self.faction.to_lowercase(), self.reaction])
     }
 }
 
@@ -333,6 +351,7 @@ impl SqlJoinInfo for FactionRequirement {
 }
 
 // used in ARMO, CLOT
+// depends on BODY
 impl SqlJoinInfo for BipedObject {
     fn table_name(&self) -> &'static str {
         "JOIN_BipedObject"
@@ -343,6 +362,9 @@ impl SqlJoinInfo for BipedObject {
         vec![
             "FOREIGN KEY(armo_id) REFERENCES ARMO(id)",
             "FOREIGN KEY(clot_id) REFERENCES CLOT(id)",
+            //
+            "FOREIGN KEY(male_bodypart) REFERENCES BODY(id)",
+            "FOREIGN KEY(female_bodypart) REFERENCES BODY(id)",
         ]
     }
 
@@ -367,13 +389,14 @@ impl SqlJoinInfo for BipedObject {
                 links[0],
                 links[1],
                 as_enum!(self.biped_object_type),
-                self.male_bodypart,
-                self.female_bodypart
+                as_option!(self.male_bodypart.to_lowercase()),
+                as_option!(self.female_bodypart.to_lowercase())
             ],
         )
     }
 }
 
+// used in SPEL, ENCH, ALCH
 impl SqlJoinInfo for Effect {
     fn table_name(&self) -> &'static str {
         "JOIN_Effect"
@@ -435,7 +458,12 @@ impl SqlJoinInfo for Reference {
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec!["FOREIGN KEY(cell_id) REFERENCES CELL(id)"]
+        vec![
+            "FOREIGN KEY(cell_id) REFERENCES CELL(id)",
+            "FOREIGN KEY(owner) REFERENCES NPC_(id)",
+            "FOREIGN KEY(owner_global) REFERENCES GLOB(id)",
+            "FOREIGN KEY(owner_faction) REFERENCES FACT(id)",
+        ]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -469,6 +497,18 @@ impl SqlJoinInfo for Reference {
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let owner = if let Some(owner) = &self.owner { owner } else { "" };
+        let owner_global = if let Some(owner_global) = &self.owner_global {
+            owner_global
+        } else {
+            ""
+        };
+        let owner_faction = if let Some(owner_faction) = &self.owner_faction {
+            owner_faction
+        } else {
+            ""
+        };
+
         self.table_insert2(
             db,
             mod_name,
@@ -482,9 +522,9 @@ impl SqlJoinInfo for Reference {
                 as_sql!(self.rotation),
                 self.scale,
                 as_sql!(self.moved_cell),
-                self.owner,
-                self.owner_global,
-                self.owner_faction,
+                as_option!(owner),
+                as_option!(owner_global),
+                as_option!(owner_faction),
                 self.owner_faction_rank,
                 self.charge_left,
                 self.health_left,

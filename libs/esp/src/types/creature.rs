@@ -369,7 +369,7 @@ impl SqlInfo for Creature {
 
         for spell_id in &self.spells {
             let join = SpellJoin {
-                spell_id: spell_id.clone(),
+                spell_id: spell_id.clone().to_lowercase(),
             };
             join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id().to_lowercase(), &Null])?;
         }

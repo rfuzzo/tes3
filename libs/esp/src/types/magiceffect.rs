@@ -177,11 +177,11 @@ impl SqlInfo for MagicEffect {
         vec![
             //("effect_id", "TEXT"), //enum
             ("icon", "TEXT"),
-            ("texture", "TEXT"),    //FK?
-            ("bolt_sound", "TEXT"), //FK
-            ("cast_sound", "TEXT"), //FK
-            ("hit_sound", "TEXT"),  //FK
-            ("area_sound", "TEXT"), //FK
+            ("texture", "TEXT"),
+            ("bolt_sound", "TEXT COLLATE NOCASE"), //FK
+            ("cast_sound", "TEXT COLLATE NOCASE"), //FK
+            ("hit_sound", "TEXT COLLATE NOCASE"),  //FK
+            ("area_sound", "TEXT COLLATE NOCASE"), //FK
             ("cast_visual", "TEXT"),
             ("bolt_visual", "TEXT"),
             ("hit_visual", "TEXT"),
@@ -215,10 +215,10 @@ impl SqlInfo for MagicEffect {
                 //as_enum!(self.effect_id),
                 self.icon,
                 self.texture,
-                as_option!(self.bolt_sound.to_lowercase()), //thanks todd
-                as_option!(self.cast_sound.to_lowercase()), //thanks todd
-                as_option!(self.hit_sound.to_lowercase()),  //thanks todd
-                as_option!(self.area_sound.to_lowercase()), //thanks todd
+                as_option!(self.bolt_sound),
+                as_option!(self.cast_sound),
+                as_option!(self.hit_sound),
+                as_option!(self.area_sound),
                 self.cast_visual,
                 self.bolt_visual,
                 self.hit_visual,

@@ -363,7 +363,7 @@ impl SqlInfo for Npc {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             // ai data
             ("hello", "INTEGER"),
@@ -372,12 +372,12 @@ impl SqlInfo for Npc {
             ("alarm", "INTEGER"),
             ("services", "INTEGER"), // flags
             //
-            ("race", "TEXT"),      //FK
-            ("class", "TEXT"),     //FK
-            ("faction", "TEXT"),   //FK
-            ("head", "TEXT"),      //FK
-            ("hair", "TEXT"),      //FK
-            ("npc_flags", "TEXT"), //flags
+            ("race", "TEXT COLLATE NOCASE"),    //FK
+            ("class", "TEXT COLLATE NOCASE"),   //FK
+            ("faction", "TEXT COLLATE NOCASE"), //FK
+            ("head", "TEXT COLLATE NOCASE"),    //FK
+            ("hair", "TEXT COLLATE NOCASE"),    //FK
+            ("npc_flags", "TEXT"),              //flags
             ("blood_type", "INTEGER"),
             // data
             ("level", "INTEGER"),
@@ -398,9 +398,9 @@ impl SqlInfo for Npc {
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(script) REFERENCES SCPT(id)",
+            "FOREIGN KEY(race) REFERENCES RACE(id)",
             "FOREIGN KEY(class) REFERENCES CLAS(id)",
             "FOREIGN KEY(faction) REFERENCES FACT(id)",
-            "FOREIGN KEY(race) REFERENCES RACE(id)",
             "FOREIGN KEY(head) REFERENCES BODY(id)",
             "FOREIGN KEY(hair) REFERENCES BODY(id)",
         ]
@@ -425,8 +425,8 @@ impl SqlInfo for Npc {
                 as_option!(self.race),
                 as_option!(self.class),
                 as_option!(self.faction),
-                as_option!(self.head.to_lowercase()), //thanks todd
-                as_option!(self.hair.to_lowercase()), //thanks todd
+                as_option!(self.head),
+                as_option!(self.hair),
                 as_flags!(self.npc_flags),
                 self.blood_type,
                 //
@@ -452,22 +452,22 @@ impl SqlInfo for Npc {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id().to_lowercase()])?;
+            join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id()])?;
         }
 
         for spell_id in &self.spells {
             let join = SpellJoin {
-                spell_id: spell_id.clone().to_lowercase(),
+                spell_id: spell_id.clone(),
             };
-            join.table_insert(db, mod_name, &[&Null, &Null, &Null, &self.editor_id().to_lowercase()])?;
+            join.table_insert(db, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
         }
 
         for dest in &self.travel_destinations {
-            dest.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase()])?;
+            dest.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
         }
 
         for package in &self.ai_packages {
-            package.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase()])?;
+            package.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
         }
         Ok(0)
     }

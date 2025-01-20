@@ -216,11 +216,11 @@ impl SqlInfo for Faction {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for reaction in &self.reactions {
-            reaction.table_insert(db, mod_name, &[&self.editor_id().to_lowercase()])?;
+            reaction.table_insert(db, mod_name, &[&self.editor_id()])?;
         }
 
         for requirement in &self.data.requirements {
-            requirement.table_insert(db, mod_name, &[&self.editor_id().to_lowercase()])?;
+            requirement.table_insert(db, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

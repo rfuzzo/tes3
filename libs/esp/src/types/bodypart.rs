@@ -114,7 +114,7 @@ impl Save for BodypartData {
 impl SqlInfo for Bodypart {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("race", "TEXT"), // FK
+            ("race", "TEXT COLLATE NOCASE"), // FK
             ("mesh", "TEXT"),
             //
             ("part", "TEXT"), //enum

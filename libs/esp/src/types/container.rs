@@ -111,7 +111,7 @@ impl SqlInfo for Container {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             ("encumbrance", "REAL"),
             ("container_flags", "TEXT"), //flags
@@ -143,7 +143,7 @@ impl SqlInfo for Container {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null, &Null])?;
+            join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
         }
         Ok(0)
     }

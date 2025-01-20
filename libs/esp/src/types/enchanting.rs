@@ -105,7 +105,7 @@ impl SqlInfo for Enchanting {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for effect in &self.effects {
-            effect.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase(), &Null])?;
+            effect.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
         }
         Ok(0)
     }

@@ -114,7 +114,7 @@ impl SqlInfo for Spell {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for effect in &self.effects {
-            effect.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null, &Null])?;
+            effect.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
         }
         Ok(1)
     }

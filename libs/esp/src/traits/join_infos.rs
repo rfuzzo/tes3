@@ -154,7 +154,7 @@ impl SqlJoinInfo for CreatureJoin {
         vec![
             "FOREIGN KEY(levc_id) REFERENCES LEVC(id)",
             //
-            "FOREIGN KEY(creature_id) REFERENCES CREA(id)",
+            "FOREIGN KEY(creature_id) REFERENCES CREA(id)", // can also be NPC_
         ]
     }
 
@@ -303,13 +303,13 @@ impl SqlJoinInfo for FactionReaction {
             // parents
             ("fact_id", "TEXT"), //FK
             // this
-            ("faction", "TEXT"), //FK
+            ("faction", "TEXT COLLATE NOCASE"), //FK
             ("reaction", "INTEGER"),
         ]
     }
 
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], self.faction.to_lowercase(), self.reaction])
+        self.table_insert2(db, mod_name, params![links[0], self.faction, self.reaction])
     }
 }
 
@@ -374,9 +374,9 @@ impl SqlJoinInfo for BipedObject {
             ("armo_id", "TEXT"), //FK
             ("clot_id", "TEXT"), //FK
             // this
-            ("biped_object_type", "TEXT"), //enum
-            ("male_bodypart", "TEXT"),     //fk
-            ("female_bodypart", "TEXT"),   //fk
+            ("biped_object_type", "TEXT"),              //enum
+            ("male_bodypart", "TEXT COLLATE NOCASE"),   //fk
+            ("female_bodypart", "TEXT COLLATE NOCASE"), //fk
         ]
     }
 
@@ -389,8 +389,8 @@ impl SqlJoinInfo for BipedObject {
                 links[0],
                 links[1],
                 as_enum!(self.biped_object_type),
-                as_option!(self.male_bodypart.to_lowercase()),
-                as_option!(self.female_bodypart.to_lowercase())
+                as_option!(self.male_bodypart),
+                as_option!(self.female_bodypart)
             ],
         )
     }

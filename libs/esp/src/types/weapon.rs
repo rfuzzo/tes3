@@ -127,10 +127,10 @@ impl SqlInfo for Weapon {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("enchanting", "TEXT"), //FK
+            ("enchanting", "TEXT COLLATE NOCASE"), //FK
             //
             ("weight", "REAL"),
             ("value", "INTEGER"),

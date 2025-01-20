@@ -127,11 +127,11 @@ impl SqlInfo for Armor {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("enchanting", "TEXT"), //FK
-            ("armor_type", "TEXT"), //enum
+            ("enchanting", "TEXT COLLATE NOCASE"), //FK
+            ("armor_type", "TEXT"),                //enum
             ("weight", "REAL"),
             ("value", "INTEGER"),
             ("health", "INTEGER"),
@@ -170,7 +170,7 @@ impl SqlInfo for Armor {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for biped_object in &self.biped_objects {
-            biped_object.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null])?;
+            biped_object.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
         }
         Ok(1)
     }

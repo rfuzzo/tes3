@@ -99,15 +99,16 @@ impl SqlInfo for Door {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
-            ("open_sound", "TEXT"),  //FK
-            ("close_sound", "TEXT"), //FK
+            ("open_sound", "TEXT COLLATE NOCASE"),  //FK
+            ("close_sound", "TEXT COLLATE NOCASE"), //FK
         ]
     }
 
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
+            "FOREIGN KEY(script) REFERENCES SCPT(id)",
             "FOREIGN KEY(open_sound) REFERENCES SOUN(id)",
             "FOREIGN KEY(close_sound) REFERENCES SOUN(id)",
         ]

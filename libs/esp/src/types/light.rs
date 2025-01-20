@@ -119,10 +119,10 @@ impl SqlInfo for Light {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("sound", "TEXT"), //FK
+            ("sound", "TEXT COLLATE NOCASE"), //FK
             ("weight", "REAL"),
             ("value", "INTEGER"),
             ("time", "INTEGER"),

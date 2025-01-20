@@ -264,7 +264,7 @@ impl SqlInfo for Creature {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             // ai data
             ("hello", "INTEGER"),
@@ -273,7 +273,7 @@ impl SqlInfo for Creature {
             ("alarm", "INTEGER"),
             ("services", "INTEGER"), // flags
             //
-            ("sound", "TEXT"), //FK
+            ("sound", "TEXT COLLATE NOCASE"), //FK
             ("scale", "REAL"),
             ("creature_flags", "TEXT"), //flags
             ("blood_type", "INTEGER"),
@@ -364,22 +364,22 @@ impl SqlInfo for Creature {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase(), &Null])?;
+            join.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
         }
 
         for spell_id in &self.spells {
             let join = SpellJoin {
-                spell_id: spell_id.clone().to_lowercase(),
+                spell_id: spell_id.clone(),
             };
-            join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id().to_lowercase(), &Null])?;
+            join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
         }
 
         for dest in &self.travel_destinations {
-            dest.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null])?;
+            dest.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
         }
 
         for package in &self.ai_packages {
-            package.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null])?;
+            package.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
         }
         Ok(0)
     }

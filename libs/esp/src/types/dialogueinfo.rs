@@ -354,12 +354,12 @@ impl SqlInfo for DialogueInfo {
             ("speaker_rank", "INTEGER"),
             ("speaker_sex", "TEXT"), //enum
             ("player_rank", "INTEGER"),
-            ("speaker_id", "TEXT"),      //FK
-            ("speaker_race", "TEXT"),    //FK
-            ("speaker_class", "TEXT"),   //FK
-            ("speaker_faction", "TEXT"), //FK
-            ("speaker_cell", "TEXT"),    //FK
-            ("player_faction", "TEXT"),  //FK
+            ("speaker_id", "TEXT COLLATE NOCASE"),      //FK
+            ("speaker_race", "TEXT COLLATE NOCASE"),    //FK
+            ("speaker_class", "TEXT COLLATE NOCASE"),   //FK
+            ("speaker_faction", "TEXT COLLATE NOCASE"), //FK
+            ("speaker_cell", "TEXT"),                   //FK
+            ("player_faction", "TEXT COLLATE NOCASE"),  //FK
             ("sound_path", "TEXT"),
             ("text", "TEXT"),
             ("quest_state", "TEXT"), //enum
@@ -409,7 +409,7 @@ impl SqlInfo for DialogueInfo {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for filter in &self.filters {
-            filter.table_insert(db, mod_name, &[&self.editor_id().to_lowercase()])?;
+            filter.table_insert(db, mod_name, &[&self.editor_id()])?;
         }
         Ok(1)
     }

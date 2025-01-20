@@ -118,7 +118,7 @@ impl SqlInfo for Alchemy {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
             ("weight", "REAL"),
@@ -150,7 +150,7 @@ impl SqlInfo for Alchemy {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for effect in &self.effects {
-            effect.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id().to_lowercase()])?;
+            effect.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id()])?;
         }
         Ok(1)
     }

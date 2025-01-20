@@ -125,10 +125,10 @@ impl SqlInfo for Clothing {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
             ("name", "TEXT"),
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
             ("mesh", "TEXT"),
             ("icon", "TEXT"),
-            ("enchanting", "TEXT"), //FK
+            ("enchanting", "TEXT COLLATE NOCASE"), //FK
             //
             ("clothing_type", "TEXT"), //enum
             ("weight", "REAL"),
@@ -166,7 +166,7 @@ impl SqlInfo for Clothing {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for biped_object in &self.biped_objects {
-            biped_object.table_insert(db, mod_name, &[&Null, &self.editor_id().to_lowercase()])?;
+            biped_object.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
         }
         Ok(1)
     }

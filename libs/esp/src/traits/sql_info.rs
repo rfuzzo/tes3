@@ -13,7 +13,7 @@ macro_rules! as_option {
         if $x.is_empty() {
             None
         } else {
-            Some($x.to_lowercase().to_owned())
+            Some($x.to_owned())
         }
     };
 }
@@ -206,7 +206,7 @@ impl SqlInfoMeta for TES3Object {
             param_names
         );
 
-        let id = self.editor_id().to_lowercase();
+        let id = self.editor_id();
         let flags = as_flags!(self.object_flags());
         let mut final_params = params![id, mod_name, flags].to_vec();
         final_params.extend_from_slice(params);

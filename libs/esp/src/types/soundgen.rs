@@ -80,9 +80,9 @@ impl Save for SoundGen {
 impl SqlInfo for SoundGen {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("sound_gen_type", "TEXT"), //enum
-            ("creature", "TEXT"),       //FK
-            ("sound", "TEXT"),          //FK
+            ("sound_gen_type", "TEXT"),          //enum
+            ("creature", "TEXT COLLATE NOCASE"), //FK
+            ("sound", "TEXT COLLATE NOCASE"),    //FK
         ]
     }
 
@@ -100,8 +100,8 @@ impl SqlInfo for SoundGen {
             mod_name,
             params![
                 as_enum!(self.sound_gen_type),
-                as_option!(self.creature.to_lowercase()),
-                as_option!(self.sound.to_lowercase()),
+                as_option!(self.creature),
+                as_option!(self.sound),
             ],
         )
     }

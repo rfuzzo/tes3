@@ -275,8 +275,8 @@ impl SqlInfo for Cell {
             ("data_flags", "TEXT"), // flags
             ("grid", "TEXT"),       // format
             //
-            ("region", "TEXT"),    //FK
-            ("map_color", "TEXT"), // color
+            ("region", "TEXT COLLATE NOCASE"), //FK
+            ("map_color", "TEXT"),             // color
             ("water_height", "REAL"),
             //
             ("ambient_color", "TEXT"),  // color
@@ -318,7 +318,7 @@ impl SqlInfo for Cell {
 
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for (grid, reference) in &self.references {
-            reference.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &as_sql!(grid)])?;
+            reference.table_insert(db, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
         }
         Ok(0)
     }

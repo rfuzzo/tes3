@@ -62,7 +62,7 @@ impl Save for StartScript {
 impl SqlInfo for StartScript {
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
         vec![
-            ("script", "TEXT"), //FK
+            ("script", "TEXT COLLATE NOCASE"), //FK
         ]
     }
 

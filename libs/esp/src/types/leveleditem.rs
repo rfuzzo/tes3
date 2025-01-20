@@ -123,7 +123,7 @@ impl SqlInfo for LeveledItem {
                 item_id: item_id.to_string(),
                 probability: probability.to_owned(),
             };
-            join.table_insert(db, mod_name, &[&self.editor_id().to_lowercase()])?;
+            join.table_insert(db, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

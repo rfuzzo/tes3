@@ -124,10 +124,10 @@ impl SqlInfo for LeveledCreature {
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for (creature_id, probability) in &self.creatures {
             let join = CreatureJoin {
-                creature_id: creature_id.to_string().to_lowercase(),
+                creature_id: creature_id.to_string(),
                 probability: probability.to_owned(),
             };
-            join.table_insert(db, mod_name, &[&self.editor_id().to_lowercase()])?;
+            join.table_insert(db, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

@@ -196,9 +196,9 @@ impl SqlInfo for Race {
     fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
         for spell_id in &self.spells {
             let join = SpellJoin {
-                spell_id: spell_id.clone().to_lowercase(),
+                spell_id: spell_id.clone(),
             };
-            join.table_insert(db, mod_name, &[&self.editor_id().to_lowercase(), &Null, &Null, &Null])?;
+            join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null, &Null])?;
         }
         Ok(1)
     }

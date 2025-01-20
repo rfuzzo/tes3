@@ -94,7 +94,7 @@ pub trait SqlJoinInfo {
             .join(", ");
 
         let str = format!(
-            "INSERT INTO {}
+            "REPLACE INTO {}
             (
             mod, {}
             ) 
@@ -193,7 +193,7 @@ impl SqlInfoMeta for TES3Object {
 
         let as_tes3: TES3Object = self.clone().into();
         let str = format!(
-            "INSERT INTO {}
+            "REPLACE INTO {}
             (
             id, mod, flags, {}
             ) 

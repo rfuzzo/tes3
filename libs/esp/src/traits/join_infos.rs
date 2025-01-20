@@ -139,7 +139,7 @@ impl SqlJoinInfo for ItemJoin {
 }
 
 // used in LEVC
-// depends on CREA or NPC_ //TODO
+// depends on CREA or NPC_ or another list //TODO
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct CreatureJoin {
     pub creature_id: String,
@@ -154,7 +154,7 @@ impl SqlJoinInfo for CreatureJoin {
         vec![
             "FOREIGN KEY(levc_id) REFERENCES LEVC(id)",
             //
-            "FOREIGN KEY(creature_id) REFERENCES CREA(id)", // can also be NPC_
+            //"FOREIGN KEY(creature_id) REFERENCES CREA(id)", // can also be NPC_
         ]
     }
 

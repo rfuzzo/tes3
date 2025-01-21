@@ -52,6 +52,15 @@ pub struct TableSchema {
     pub columns: Vec<String>,
     pub constraints: Vec<&'static str>,
 }
+
+#[derive(Debug)]
+pub struct JoinTableSchema {
+    pub name: &'static str,
+    pub columns: Vec<String>,
+    pub parent_constraints: Vec<&'static str>,
+    pub constraints: Vec<&'static str>,
+}
+
 pub trait SqlInfoMeta {
     fn table_name(&self) -> &'static str;
     fn table_schema(&self) -> TableSchema;
@@ -76,6 +85,7 @@ pub trait SqlJoinInfo {
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![]
     }
+    fn table_parent_constraints(&self) -> Vec<&'static str>;
     fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize>;
 
     fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize> {
@@ -113,8 +123,8 @@ pub trait SqlJoinInfo {
         db.execute(str.as_str(), final_params.as_slice())
     }
 
-    fn table_schema(&self) -> TableSchema {
-        TableSchema {
+    fn table_schema(&self) -> JoinTableSchema {
+        JoinTableSchema {
             name: self.table_name(),
             columns: self
                 .table_columns()
@@ -122,6 +132,7 @@ pub trait SqlJoinInfo {
                 .map(|(name, ty)| format!("{} {}", name, ty))
                 .collect::<Vec<_>>(),
             constraints: self.table_constraints(),
+            parent_constraints: self.table_parent_constraints(),
         }
     }
 }

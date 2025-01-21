@@ -10,16 +10,17 @@ impl SqlJoinInfo for SpellJoin {
     fn table_name(&self) -> &'static str {
         "JOIN_Spells"
     }
-
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(race_id) REFERENCES RACE(id)",
             "FOREIGN KEY(bsgn_id) REFERENCES BSGN(id)",
             "FOREIGN KEY(crea_id) REFERENCES CREA(id)",
             "FOREIGN KEY(npc_id) REFERENCES NPC_(id)",
-            //
-            "FOREIGN KEY(spell_id) REFERENCES SPEL(id)",
         ]
+    }
+
+    fn table_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(spell_id) REFERENCES SPEL(id)"]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -50,12 +51,11 @@ impl SqlJoinInfo for SoundJoin {
         "JOIN_Sounds"
     }
 
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(regn_id) REFERENCES REGN(id)"]
+    }
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec![
-            "FOREIGN KEY(regn_id) REFERENCES REGN(id)",
-            //
-            "FOREIGN KEY(sound_id) REFERENCES SOUN(id)",
-        ]
+        vec!["FOREIGN KEY(sound_id) REFERENCES SOUN(id)"]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -83,7 +83,7 @@ impl SqlJoinInfo for InventoryJoin {
         "JOIN_Inventory"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(cont_id) REFERENCES CONT(id)",
             "FOREIGN KEY(crea_id) REFERENCES CREA(id)",
@@ -119,7 +119,7 @@ impl SqlJoinInfo for ItemJoin {
         "JOIN_Item"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec!["FOREIGN KEY(levi_id) REFERENCES LEVI(id)"]
     }
 
@@ -150,10 +150,11 @@ impl SqlJoinInfo for CreatureJoin {
         "JOIN_Creature"
     }
 
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(levc_id) REFERENCES LEVC(id)"]
+    }
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
-            "FOREIGN KEY(levc_id) REFERENCES LEVC(id)",
-            //
             //"FOREIGN KEY(creature_id) REFERENCES CREA(id)", // can also be NPC_
         ]
     }
@@ -179,7 +180,7 @@ impl SqlJoinInfo for TravelDestination {
         "JOIN_TravelDestination"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(crea_id) REFERENCES CREA(id)",
             "FOREIGN KEY(npc_id) REFERENCES NPC_(id)",
@@ -219,7 +220,7 @@ impl SqlJoinInfo for AiPackage {
         "JOIN_AiPackage"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec![
             "FOREIGN KEY(crea_id) REFERENCES CREA(id)",
             "FOREIGN KEY(npc_id) REFERENCES NPC_(id)",
@@ -248,7 +249,7 @@ impl SqlJoinInfo for Filter {
         "JOIN_Filter"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec!["FOREIGN KEY(info_id) REFERENCES INFO(id)"]
     }
 
@@ -290,12 +291,11 @@ impl SqlJoinInfo for FactionReaction {
         "JOIN_FactionReaction"
     }
 
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(fact_id) REFERENCES FACT(id)"]
+    }
     fn table_constraints(&self) -> Vec<&'static str> {
-        vec![
-            "FOREIGN KEY(fact_id) REFERENCES FACT(id)",
-            //
-            "FOREIGN KEY(faction) REFERENCES FACT(id)",
-        ]
+        vec!["FOREIGN KEY(faction) REFERENCES FACT(id)"]
     }
 
     fn table_columns(&self) -> Vec<(&'static str, &'static str)> {
@@ -319,7 +319,7 @@ impl SqlJoinInfo for FactionRequirement {
         "JOIN_FactionRequirement"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         vec!["FOREIGN KEY(fact_id) REFERENCES FACT(id)"]
     }
 
@@ -357,12 +357,16 @@ impl SqlJoinInfo for BipedObject {
         "JOIN_BipedObject"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         // TODO add unique constraint
         vec![
             "FOREIGN KEY(armo_id) REFERENCES ARMO(id)",
             "FOREIGN KEY(clot_id) REFERENCES CLOT(id)",
-            //
+        ]
+    }
+    fn table_constraints(&self) -> Vec<&'static str> {
+        // TODO add unique constraint
+        vec![
             "FOREIGN KEY(male_bodypart) REFERENCES BODY(id)",
             "FOREIGN KEY(female_bodypart) REFERENCES BODY(id)",
         ]
@@ -402,7 +406,7 @@ impl SqlJoinInfo for Effect {
         "JOIN_Effect"
     }
 
-    fn table_constraints(&self) -> Vec<&'static str> {
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
         // TODO add unique constraint
         vec![
             "FOREIGN KEY(spell_id) REFERENCES SPEL(id)",
@@ -457,9 +461,12 @@ impl SqlJoinInfo for Reference {
         "JOIN_Reference"
     }
 
+    fn table_parent_constraints(&self) -> Vec<&'static str> {
+        vec!["FOREIGN KEY(cell_id) REFERENCES CELL(id)"]
+    }
+
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![
-            "FOREIGN KEY(cell_id) REFERENCES CELL(id)",
             "FOREIGN KEY(owner) REFERENCES NPC_(id)",
             "FOREIGN KEY(owner_global) REFERENCES GLOB(id)",
             "FOREIGN KEY(owner_faction) REFERENCES FACT(id)",

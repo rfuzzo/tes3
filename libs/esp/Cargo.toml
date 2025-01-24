@@ -12,7 +12,12 @@ bstr = { version = "^1.5", default-features = false, features = ["std"] }
 bytemuck = { version = "^1.13", features = ["derive"] }
 bytes_io = { path = "../bytes_io" }
 cow-utils = "^0.1"
-derive_more = { version = "^1.0", features = ["deref", "deref_mut", "from", "into" ] }
+derive_more = { version = "^1.0", features = [
+  "deref",
+  "deref_mut",
+  "from",
+  "into",
+] }
 esp_macros = { path = "../esp_macros" }
 hashbrown = { version = ">=0.12, <1.0", features = ["rayon"] }
 itoa = "^1.0"
@@ -23,8 +28,8 @@ base64-simd = { version = "^0.8", optional = true }
 serde = { version = "^1.0", features = ["derive"], optional = true }
 zstd = { version = "^0.13", optional = true }
 # egui related features
-ecolor = { version = "^0.27", optional = true }
-egui = { version = "^0.27", optional = true }
+ecolor = { version = "^0.30", optional = true }
+egui = { version = "^0.30", optional = true }
 serde_json = { version = "^1.0", optional = true }
 
 [dev-dependencies]

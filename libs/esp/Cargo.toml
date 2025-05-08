@@ -29,8 +29,8 @@ base64-simd = { version = "^0.8", optional = true }
 serde = { version = "^1.0", features = ["derive"], optional = true }
 zstd = { version = "^0.13", optional = true }
 # egui related features
-ecolor = { version = "^0.30", optional = true }
-egui = { version = "^0.30", optional = true }
+ecolor = { version = "^0.31", optional = true }
+egui = { version = "^0.31", optional = true }
 serde_json = { version = "^1.0", optional = true }
 
 [dev-dependencies]

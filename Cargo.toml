@@ -43,6 +43,7 @@ rust_2018_compatibility = { level = "warn", priority = -1 }
 rust_2018_idioms = { level = "warn", priority = -1 }
 rust_2021_compatibility = { level = "warn", priority = -1 }
 unused = { level = "warn", priority = -1 }
+stable_features = "allow" # extract_if
 #
 # Allowed-by-default Lints
 # https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
@@ -103,6 +104,8 @@ match_wildcard_for_single_variants = "allow"
 unsafe_derive_deserialize = "allow"
 multiple_crate_versions = "allow"
 wildcard_imports = "allow"
+needless_continue = "allow"
+cast_lossless = "allow"
 #
 # Clippy Group: Nursery
 # https://rust-lang.github.io/rust-clippy/master/index.html#?groups=nursery

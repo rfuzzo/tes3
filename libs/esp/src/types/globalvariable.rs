@@ -6,8 +6,16 @@ use crate::prelude::*;
 pub struct GlobalVariable {
     pub flags: ObjectFlags,
     pub id: String,
-    pub global_type: GlobalType,
-    pub value: f32,
+    pub value: GlobalValue,
+}
+
+#[esp_meta]
+#[derive(Clone, Copy, Debug, PartialEq, SmartDefault)]
+pub enum GlobalValue {
+    #[default]
+    Float(f32),
+    Long(i32),
+    Short(i16),
 }
 
 impl Load for GlobalVariable {
@@ -23,13 +31,11 @@ impl Load for GlobalVariable {
                 }
                 b"FNAM" => {
                     stream.expect(1u32)?;
-                    this.global_type = stream.load()?;
-                }
-                b"FLTV" => {
+                    let global_type = stream.load()?;
+                    stream.expect(*b"FLTV")?;
                     stream.expect(4u32)?;
-                    let value: f32 = stream.load()?;
-                    // Ignore NaNs, see "ratskilled" in "Morrowind.esm".
-                    this.value = if value.is_nan() { 0.0 } else { value };
+                    let global_value = stream.load()?;
+                    this.value = GlobalValue::from_f32(global_type, global_value);
                 }
                 b"DELE" => {
                     let size: u32 = stream.load()?;
@@ -55,17 +61,72 @@ impl Save for GlobalVariable {
         // FNAM
         stream.save(b"FNAM")?;
         stream.save(&1u32)?;
-        stream.save(&self.global_type)?;
+        stream.save(&self.value.global_type())?;
         // FLTV
         stream.save(b"FLTV")?;
         stream.save(&4u32)?;
-        stream.save(&self.value)?;
+        stream.save(&self.value.to_f32())?;
         // DELE
         if self.flags.contains(ObjectFlags::DELETED) {
             stream.save(b"DELE")?;
             stream.save(&4u32)?;
             stream.save(&0u32)?;
         }
+        // Disallow values with known precision errors.
+        if self.value.has_precision_error() {
+            Reader::error(format!("GlobalVariable precision error: {}", self.id))?;
+        }
         Ok(())
+    }
+}
+
+impl GlobalValue {
+    #[allow(clippy::cast_possible_truncation)]
+    pub const fn from_f32(t: GlobalType, v: f32) -> Self {
+        // NaNs are converted to zero by the engine.
+        // Example: "ratskilled" in "Morrowind.esm".
+        let v = if v.is_nan() { 0.0 } else { v };
+        match t {
+            GlobalType::Float => GlobalValue::Float(v),
+            GlobalType::Long => GlobalValue::Long(v as i32),
+            GlobalType::Short => GlobalValue::Short(v as i16),
+        }
+    }
+
+    #[allow(clippy::cast_precision_loss)]
+    pub const fn to_f32(self) -> f32 {
+        match self {
+            GlobalValue::Float(v) => v,
+            GlobalValue::Long(v) => v as f32,
+            GlobalValue::Short(v) => v as f32,
+        }
+    }
+
+    pub const fn global_type(self) -> GlobalType {
+        match self {
+            GlobalValue::Float(_) => GlobalType::Float,
+            GlobalValue::Long(_) => GlobalType::Long,
+            GlobalValue::Short(_) => GlobalType::Short,
+        }
+    }
+
+    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    pub const fn has_precision_error(self) -> bool {
+        match self {
+            GlobalValue::Float(_) => false,
+            GlobalValue::Long(v) => (v as f32 as i32) != v,
+            GlobalValue::Short(v) => (v as f32 as i16) != v,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_precision_error() {
+        let value = GlobalValue::Long(16777217);
+        assert!(value.has_precision_error());
     }
 }

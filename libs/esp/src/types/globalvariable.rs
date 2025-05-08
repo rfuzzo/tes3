@@ -9,7 +9,7 @@ pub struct GlobalVariable {
     pub value: GlobalValue,
 }
 
-#[esp_meta]
+#[esp_meta(true)]
 #[derive(Clone, Copy, Debug, PartialEq, SmartDefault)]
 pub enum GlobalValue {
     #[default]

@@ -748,6 +748,29 @@ impl Editor for FilterValue {
     }
 }
 
+impl Editor for GlobalValue {
+    fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
+        let mut selected = self.to_owned();
+        egui::ComboBox::from_label("Select one!")
+            .selected_text(format!("{:?}", selected))
+            .show_ui(ui, |ui| {
+                ui.selectable_value(&mut selected, GlobalValue::Float(0_f32), "Float");
+                ui.selectable_value(&mut selected, GlobalValue::Long(0), "Long");
+                ui.selectable_value(&mut selected, GlobalValue::Short(0), "Short");
+            });
+        *self = selected;
+    }
+    fn to_json(&self) -> String {
+        if let Ok(s) = serde_json::to_string(self) {
+            return s;
+        }
+        "".to_owned()
+    }
+    fn get_editor_list(&mut self) -> Option<Vec<(&str, &mut dyn Editor)>> {
+        None
+    }
+}
+
 impl Editor for GameSettingValue {
     fn add_editor(&mut self, ui: &mut egui::Ui, _name: String) {
         let mut selected = self.to_owned();

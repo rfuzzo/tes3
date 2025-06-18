@@ -54,8 +54,8 @@ where
     [L::Repr; N]: Load,
 {
     fn load(stream: &mut Reader<'_>) -> io::Result<Self> {
-        L::from_repr_array(stream.load()?) //
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
+        let array: [L::Repr; N] = stream.load()?;
+        Ok(array.map(|value| value.try_into().unwrap_or_default()))
     }
 }
 
@@ -114,10 +114,10 @@ macro_rules! impl_load {
             #[cfg(feature = "nightly")]
             impl Load for Vec<$T> {
                 fn load(stream: &mut Reader<'_>) -> io::Result<Self> {
-                    use bytemuck::{cast_slice_mut, zeroed_vec};
+                    use bytemuck::{must_cast_slice_mut, zeroed_vec};
                     let len = stream.load_as::<u32, usize>()?;
                     let mut this = zeroed_vec(len);
-                    stream.read_exact(cast_slice_mut(&mut this))?;
+                    stream.read_exact(must_cast_slice_mut(&mut this))?;
                     Ok(this)
                 }
             }

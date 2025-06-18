@@ -52,7 +52,6 @@ absolute_paths_not_starting_with_crate = "warn"
 elided_lifetimes_in_paths = "warn"
 explicit_outlives_requirements = "warn"
 ffi_unwind_calls = "warn"
-keyword_idents = "warn"
 let_underscore_drop = "warn"
 macro_use_extern_crate = "warn"
 meta_variable_misuse = "warn"
@@ -106,12 +105,14 @@ multiple_crate_versions = "allow"
 wildcard_imports = "allow"
 needless_continue = "allow"
 cast_lossless = "allow"
+cast_possible_wrap = "allow"
 #
 # Clippy Group: Nursery
 # https://rust-lang.github.io/rust-clippy/master/index.html#?groups=nursery
 #
 nursery = { level = "warn", priority = -1 }
 use_self = "allow"
+missing-const-for-fn = "allow"
 #
 # Clippy Group: Restriction
 # https://rust-lang.github.io/rust-clippy/master/index.html#?groups=restriction

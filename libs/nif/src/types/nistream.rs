@@ -1,4 +1,5 @@
 // rust std imports
+use std::collections::VecDeque;
 use std::io::{Read, Seek, Write};
 use std::path::Path;
 
@@ -143,6 +144,20 @@ impl NiStream {
         })
     }
 
+    pub fn retain_reachable(&mut self) {
+        let mut seen = HashSet::new();
+        let mut keys = Vec::new();
+        self.roots.visitor(&mut |key| keys.push(key));
+        while let Some(key) = keys.pop() {
+            if !key.is_null() && seen.insert(key) {
+                if let Some(object) = self.objects.get(key) {
+                    object.visitor(&mut |key| keys.push(key));
+                }
+            }
+        }
+        self.objects.retain(|key, _| seen.contains(&key));
+    }
+
     /// Insert an object into the stream.
     ///
     /// # Examples
@@ -161,6 +176,7 @@ impl NiStream {
     /// assert_eq!(object1.type_name(), b"NiTriShape");
     /// assert_eq!(object2.type_name(), b"NiTriShapeData");
     /// ```
+    #[inline]
     pub fn insert<T>(&mut self, object: T) -> NiLink<T>
     where
         T: Into<NiType>,
@@ -168,6 +184,7 @@ impl NiStream {
         NiLink::new(self.objects.insert(object.into()))
     }
 
+    #[inline]
     pub fn remove<T>(&mut self, link: NiLink<T>) -> Option<T>
     where
         T: TryFrom<NiType>,
@@ -190,6 +207,7 @@ impl NiStream {
     ///
     /// assert_eq!(object.type_name(), b"NiNode")
     /// ```
+    #[inline]
     pub fn get<'a, T>(&'a self, link: NiLink<T>) -> Option<&'a T>
     where
         &'a T: TryFrom<&'a NiType>,
@@ -198,6 +216,7 @@ impl NiStream {
     }
 
     /// Retrieve an object of the specified type from the stream.
+    #[inline]
     pub fn get_as<'a, T, U>(&'a self, link: NiLink<T>) -> Option<&'a U>
     where
         &'a U: TryFrom<&'a NiType>,
@@ -205,6 +224,7 @@ impl NiStream {
         self.objects.get(link.key).and_then(|object| object.try_into().ok())
     }
 
+    #[inline]
     pub fn get_mut<'a, T>(&'a mut self, link: NiLink<T>) -> Option<&'a mut T>
     where
         &'a mut T: TryFrom<&'a mut NiType>,
@@ -213,6 +233,7 @@ impl NiStream {
     }
 
     /// Retrieve an object of the specified type from the stream.
+    #[inline]
     pub fn get_as_mut<'a, T, U>(&'a mut self, link: NiLink<T>) -> Option<&'a mut U>
     where
         &'a mut U: TryFrom<&'a mut NiType>,
@@ -221,6 +242,7 @@ impl NiStream {
     }
 
     /// Retrieve multiple objects from the stream.
+    #[inline]
     pub fn get_all<'a, T>(&'a self, links: &'a [NiLink<T>]) -> impl Iterator<Item = &'a T>
     where
         &'a T: TryFrom<&'a NiType>,
@@ -229,6 +251,7 @@ impl NiStream {
     }
 
     /// Retrieve multiple objects of the specified type from the stream.
+    #[inline]
     pub fn get_all_as<'a, T, U>(&'a self, links: &'a [NiLink<T>]) -> impl Iterator<Item = &'a U>
     where
         &'a U: 'a + TryFrom<&'a NiType>,
@@ -252,6 +275,7 @@ impl NiStream {
     ///     assert_eq!(object.type_name(), b"NiTriShape");
     /// }
     /// ```
+    #[inline]
     pub fn objects_of_type<'a, T>(&'a self) -> impl Iterator<Item = &'a T>
     where
         &'a T: 'a + TryFrom<&'a NiType>,
@@ -259,6 +283,7 @@ impl NiStream {
         self.objects.values().filter_map(|object| object.try_into().ok())
     }
 
+    #[inline]
     pub fn objects_of_type_mut<'a, T>(&'a mut self) -> impl Iterator<Item = &'a mut T>
     where
         &'a mut T: 'a + TryFrom<&'a mut NiType>,
@@ -266,6 +291,7 @@ impl NiStream {
         self.objects.values_mut().filter_map(|object| object.try_into().ok())
     }
 
+    #[inline]
     pub fn objects_of_type_with_link<'a, T>(&'a self) -> impl Iterator<Item = (NiLink<T>, &'a T)>
     where
         &'a T: 'a + TryFrom<&'a NiType>,
@@ -275,6 +301,7 @@ impl NiStream {
             .filter_map(|(key, object)| Some((NiLink::new(key), object.try_into().ok()?)))
     }
 
+    #[inline]
     pub fn objects_of_type_mut_with_link<'a, T>(&'a mut self) -> impl Iterator<Item = (NiLink<T>, &'a mut T)>
     where
         &'a mut T: 'a + TryFrom<&'a mut NiType>,
@@ -284,6 +311,7 @@ impl NiStream {
             .filter_map(|(key, object)| Some((NiLink::new(key), object.try_into().ok()?)))
     }
 
+    #[inline]
     pub fn links_of_type<'a, T>(&'a self) -> impl Iterator<Item = NiLink<T>> + 'a
     where
         &'a T: 'a + TryFrom<&'a NiType>,
@@ -292,6 +320,7 @@ impl NiStream {
     }
 
     /// Create an iterator over roots of the specified type.
+    #[inline]
     pub fn roots_of_type<'a, T>(&'a self) -> impl Iterator<Item = &'a T>
     where
         &'a T: 'a + TryFrom<&'a NiType>,
@@ -299,6 +328,7 @@ impl NiStream {
         self.get_all_as(self.roots.as_slice())
     }
 
+    #[inline]
     pub fn objects_with_name<'a, T>(&'a self, name: &'a str) -> impl Iterator<Item = &'a T>
     where
         &'a T: 'a + TryFrom<&'a NiType> + AsRef<NiObjectNET>,
@@ -307,11 +337,151 @@ impl NiStream {
             .filter(move |object| object.as_ref().name.eq_ignore_ascii_case(name))
     }
 
+    #[inline]
     pub fn objects_with_name_mut<'a, T>(&'a mut self, name: &'a str) -> impl Iterator<Item = &'a mut T>
     where
         &'a mut T: 'a + TryFrom<&'a mut NiType> + AsRef<NiObjectNET>,
     {
         self.objects_of_type_mut::<T>()
             .filter(move |object| object.as_ref().name.eq_ignore_ascii_case(name))
+    }
+
+    /// Yields all geometries and their world transforms.
+    ///
+    pub fn geometries<'a, T>(&'a self) -> impl Iterator<Item = (&'a T, Affine3A)>
+    where
+        &'a T: 'a + TryFrom<&'a NiType> + AsRef<NiGeometry>,
+    {
+        let mut queue = VecDeque::new();
+
+        for root in &self.roots {
+            queue.push_back((root.key, Affine3A::IDENTITY));
+        }
+
+        std::iter::from_fn(move || {
+            while let Some((key, transform)) = queue.pop_front() {
+                let Some(object) = self.objects.get(key) else {
+                    continue;
+                };
+
+                if let Ok(node) = <&NiNode>::try_from(object) {
+                    if !node.children.is_empty() {
+                        let transform = transform * node.transform();
+                        queue.reserve(node.children.len());
+                        for child in &node.children {
+                            queue.push_back((child.key, transform));
+                        }
+                    }
+                    continue;
+                }
+
+                if let Ok(geometry) = <&T>::try_from(object) {
+                    let transform = transform * geometry.as_ref().transform();
+                    return Some((geometry, transform));
+                };
+            }
+            None
+        })
+    }
+
+    /// Bounding sphere encompassing all geometries in the stream.
+    ///
+    pub fn bounding_sphere(&self) -> Option<NiBound> {
+        NiBound::from_geometries(
+            self.geometries::<NiGeometry>()
+                .filter_map(|(geom, transform)| Some((self.get(geom.geometry_data)?, transform))),
+        )
+    }
+
+    /// Axis-aligned bounding box encompassing all geometries in the stream.
+    ///
+    pub fn bounding_box(&self) -> Option<(Vec3, Vec3)> {
+        NiBound::aabb_from_geometries(
+            self.geometries::<NiGeometry>()
+                .filter_map(|(geom, transform)| Some((self.get(geom.geometry_data)?, transform))),
+        )
+    }
+
+    /// Convenience function for case-insensitive prefix searches.
+    ///
+    pub fn root_has_string_data_starting_with(&self, prefix: &str) -> bool {
+        for root in self.roots_of_type::<NiObjectNET>() {
+            for data in root.extra_datas_of_type::<NiStringExtraData>(self) {
+                if data.starts_with_ignore_ascii_case(prefix) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Get a link to the given object, or null if it is not in this stream.
+    ///
+    pub fn get_link(&self, object: impl AsRef<NiObject>) -> NiLink<NiObject> {
+        let object = object.as_ref();
+        self.objects_of_type_with_link::<NiObject>()
+            .find_map(|(link, other)| std::ptr::eq(object, other).then_some(link))
+            .unwrap_or_default()
+    }
+
+    pub fn clear_root_transforms(&mut self) {
+        for root in &self.roots {
+            let _ = self
+                .objects
+                .get_mut(root.key)
+                .and_then(|object| object.try_into().ok())
+                .map(NiAVObject::clear_transform);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use glam::vec3;
+
+    #[ignore = "visual"]
+    #[test]
+    fn test_bounding_sphere() {
+        let src_path = "tests/assets/random_objects.nif";
+        let dst_path = "tests/assets/random_objects~1.nif";
+
+        let mut stream = NiStream::from_path(src_path).unwrap();
+
+        let NiBound { center, radius } = stream.bounding_sphere().unwrap();
+
+        for shape in stream.objects_with_name_mut::<NiTriShape>("unitSphere") {
+            shape.translation = center;
+            shape.scale = radius;
+        }
+
+        stream.save_path(dst_path).unwrap();
+    }
+
+    #[ignore = "visual"]
+    #[test]
+    fn test_bounding_box() {
+        let src_path = "tests/assets/random_objects.nif";
+        let dst_path = "tests/assets/random_objects~1.nif";
+
+        let mut stream = NiStream::from_path(src_path).unwrap();
+
+        let (min, max) = stream.bounding_box().unwrap();
+
+        let shape = stream.objects_with_name::<NiTriShape>("unitCube").next().unwrap();
+        let data = stream.get_mut(shape.geometry_data).unwrap();
+
+        data.vertices = vec![
+            min,
+            vec3(max.x, min.y, min.z),
+            vec3(min.x, max.y, min.z),
+            vec3(max.x, max.y, min.z),
+            vec3(min.x, min.y, max.z),
+            vec3(max.x, min.y, max.z),
+            vec3(min.x, max.y, max.z),
+            max,
+        ];
+
+        stream.save_path(dst_path).unwrap();
     }
 }

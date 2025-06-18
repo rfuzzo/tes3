@@ -10,10 +10,11 @@ use crate::prelude::*;
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct NiLink<T> {
     pub key: NiKey,
-    phantom: PhantomData<*const T>,
+    phantom: PhantomData<fn() -> T>,
 }
 
 impl<T> NiLink<T> {
+    #[inline]
     pub const fn new(key: NiKey) -> Self {
         Self {
             key,
@@ -21,14 +22,17 @@ impl<T> NiLink<T> {
         }
     }
 
+    #[inline]
     pub fn null() -> Self {
         Self::new(NiKey::null())
     }
 
+    #[inline]
     pub fn is_null(&self) -> bool {
         self.key.is_null()
     }
 
+    #[inline]
     pub const fn cast<U>(&self) -> NiLink<U> {
         NiLink::new(self.key)
     }
@@ -67,7 +71,7 @@ where
         } else {
             let key = self.key.data().as_ffi();
             stream.save_as::<i32>(stream.context[&key])?;
-        };
+        }
         Ok(())
     }
 }

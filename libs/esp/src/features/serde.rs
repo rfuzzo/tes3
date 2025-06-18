@@ -1,5 +1,7 @@
+use crate::prelude::*;
+
 pub mod base64_bytes {
-    use crate::prelude::*;
+    use super::*;
 
     const BASE64: base64_simd::Base64 = base64_simd::STANDARD;
 
@@ -56,7 +58,7 @@ pub mod base64_bytes {
 }
 
 pub mod cell_references {
-    use crate::prelude::*;
+    use super::*;
 
     type T = HashMap<(u32, u32), Reference>;
 

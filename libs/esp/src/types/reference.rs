@@ -105,6 +105,9 @@ impl Load for Reference {
             }
         }
 
+        // The TESCS can produce non-finite transforms which break JSON conversion.
+        this.make_transforms_finite();
+
         Ok(this)
     }
 }
@@ -216,6 +219,10 @@ impl Save for Reference {
 }
 
 impl Reference {
+    pub const fn deleted(&self) -> bool {
+        matches!(self.deleted, Some(true))
+    }
+
     pub const fn persistent(&self) -> bool {
         // Moved references are always persistent.
         if self.moved_cell.is_some() {
@@ -233,5 +240,21 @@ impl Reference {
 
         // For everything else trust the flag.
         !self.temporary
+    }
+
+    pub(crate) fn make_transforms_finite(&mut self) {
+        for value in &mut self.translation {
+            if !value.is_finite() {
+                *value = 0.0;
+            }
+        }
+        for value in &mut self.rotation {
+            if !value.is_finite() {
+                *value = 0.0;
+            }
+        }
+        if matches!(self.scale, Some(value) if !value.is_finite()) {
+            self.scale = None;
+        }
     }
 }

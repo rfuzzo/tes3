@@ -25,8 +25,10 @@ pub(crate) mod prelude {
     pub use hashbrown::{HashMap, HashSet};
     pub use rusqlite::params;
     pub use rusqlite::types::Null;
+    pub use rusqlite::CachedStatement;
     pub use rusqlite::Connection;
     pub use rusqlite::ToSql;
+    pub use rusqlite::Transaction;
     pub use smart_default::SmartDefault;
     pub use std::io;
 

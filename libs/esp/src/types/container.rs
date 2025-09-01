@@ -122,10 +122,10 @@ impl SqlInfo for Container {
         vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 self.name,
@@ -137,13 +137,13 @@ impl SqlInfo for Container {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for (idx, item_id) in &self.inventory {
             let join = InventoryJoin {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(db, mod_name, &[&self.editor_id(), &Null, &Null])?;
+            join.table_insert(tx, mod_name, &[&self.editor_id(), &Null, &Null])?;
         }
         Ok(0)
     }

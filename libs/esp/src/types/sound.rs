@@ -85,10 +85,10 @@ impl SqlInfo for Sound {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![self.sound_path, self.data.volume, self.data.range.0, self.data.range.1,],
         )

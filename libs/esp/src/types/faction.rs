@@ -192,10 +192,10 @@ impl SqlInfo for Faction {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 self.name,
@@ -214,13 +214,13 @@ impl SqlInfo for Faction {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for reaction in &self.reactions {
-            reaction.table_insert(db, mod_name, &[&self.editor_id()])?;
+            reaction.table_insert(tx, mod_name, &[&self.editor_id()])?;
         }
 
         for requirement in &self.data.requirements {
-            requirement.table_insert(db, mod_name, &[&self.editor_id()])?;
+            requirement.table_insert(tx, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

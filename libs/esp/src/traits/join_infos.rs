@@ -35,8 +35,9 @@ impl SqlJoinInfo for SpellJoin {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], links[1], links[2], links[3], self.spell_id])
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![mod_name, links[0], links[1], links[2], links[3], self.spell_id];
+        s.execute(params)
     }
 }
 
@@ -67,8 +68,9 @@ impl SqlJoinInfo for SoundJoin {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], self.sound_id])
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![mod_name, links[0], self.sound_id];
+        s.execute(params)
     }
 }
 
@@ -103,8 +105,9 @@ impl SqlJoinInfo for InventoryJoin {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], links[1], links[2], self.index, self.item_id])
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![mod_name, links[0], links[1], links[2], self.index, self.item_id];
+        s.execute(params)
     }
 }
 
@@ -133,8 +136,9 @@ impl SqlJoinInfo for ItemJoin {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], self.item_id, self.probability])
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![mod_name, links[0], self.item_id, self.probability];
+        s.execute(params)
     }
 }
 
@@ -169,8 +173,9 @@ impl SqlJoinInfo for CreatureJoin {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], self.creature_id, self.probability])
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![mod_name, links[0], self.creature_id, self.probability];
+        s.execute(params)
     }
 }
 
@@ -199,18 +204,16 @@ impl SqlJoinInfo for TravelDestination {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(
-            db,
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![
             mod_name,
-            params![
-                links[0],
-                links[1],
-                as_sql!(self.translation),
-                as_sql!(self.rotation),
-                self.cell
-            ],
-        )
+            links[0],
+            links[1],
+            as_sql!(self.translation),
+            as_sql!(self.rotation),
+            self.cell
+        ];
+        s.execute(params)
     }
 }
 
@@ -237,9 +240,10 @@ impl SqlJoinInfo for AiPackage {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
         let value = serde_json::to_string(&self).unwrap();
-        self.table_insert2(db, mod_name, params![links[0], links[1], value])
+        let params = params![mod_name, links[0], links[1], value];
+        s.execute(params)
     }
 }
 
@@ -267,20 +271,18 @@ impl SqlJoinInfo for Filter {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(
-            db,
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![
             mod_name,
-            params![
-                links[0],
-                self.index,
-                as_enum!(self.filter_type),
-                as_enum!(self.function),
-                as_enum!(self.comparison),
-                self.id,
-                as_json!(self.value)
-            ],
-        )
+            links[0],
+            self.index,
+            as_enum!(self.filter_type),
+            as_enum!(self.function),
+            as_enum!(self.comparison),
+            self.id,
+            as_json!(self.value)
+        ];
+        s.execute(params)
     }
 }
 
@@ -308,8 +310,9 @@ impl SqlJoinInfo for FactionReaction {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(db, mod_name, params![links[0], self.faction, self.reaction])
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![mod_name, links[0], self.faction, self.reaction];
+        s.execute(params)
     }
 }
 
@@ -335,18 +338,17 @@ impl SqlJoinInfo for FactionRequirement {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(
-            db,
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![
             mod_name,
-            params![
-                links[0],
-                as_sql!(self.attributes),
-                self.primary_skill,
-                self.favored_skill,
-                self.reputation
-            ],
-        )
+            links[0],
+            as_sql!(self.attributes),
+            self.primary_skill,
+            self.favored_skill,
+            self.reputation
+        ];
+
+        s.execute(params)
     }
 }
 
@@ -385,18 +387,17 @@ impl SqlJoinInfo for BipedObject {
     }
 
     // used in ARMO, CLOT
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(
-            db,
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![
             mod_name,
-            params![
-                links[0],
-                links[1],
-                as_enum!(self.biped_object_type),
-                as_option!(self.male_bodypart),
-                as_option!(self.female_bodypart)
-            ],
-        )
+            links[0],
+            links[1],
+            as_enum!(self.biped_object_type),
+            as_option!(self.male_bodypart),
+            as_option!(self.female_bodypart)
+        ];
+
+        s.execute(params)
     }
 }
 
@@ -434,24 +435,23 @@ impl SqlJoinInfo for Effect {
     }
 
     // used in SPELL, ENCH, ALCH
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        self.table_insert2(
-            db,
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+        let params = params![
             mod_name,
-            params![
-                links[0],
-                links[1],
-                links[2],
-                as_enum!(self.magic_effect),
-                as_enum!(self.skill),
-                as_enum!(self.attribute),
-                as_enum!(self.range),
-                self.area,
-                self.duration,
-                self.min_magnitude,
-                self.max_magnitude,
-            ],
-        )
+            links[0],
+            links[1],
+            links[2],
+            as_enum!(self.magic_effect),
+            as_enum!(self.skill),
+            as_enum!(self.attribute),
+            as_enum!(self.range),
+            self.area,
+            self.duration,
+            self.min_magnitude,
+            self.max_magnitude,
+        ];
+
+        s.execute(params)
     }
 }
 
@@ -503,7 +503,7 @@ impl SqlJoinInfo for Reference {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize> {
         let owner = if let Some(owner) = &self.owner { owner } else { "" };
         let owner_global = if let Some(owner_global) = &self.owner_global {
             owner_global
@@ -516,34 +516,33 @@ impl SqlJoinInfo for Reference {
             ""
         };
 
-        self.table_insert2(
-            db,
+        let params = params![
             mod_name,
-            params![
-                links[0],
-                links[1],
-                self.mast_index,
-                self.refr_index,
-                self.temporary,
-                as_sql!(self.translation),
-                as_sql!(self.rotation),
-                self.scale,
-                as_sql!(self.moved_cell),
-                as_option!(owner),
-                as_option!(owner_global),
-                as_option!(owner_faction),
-                self.owner_faction_rank,
-                self.charge_left,
-                self.health_left,
-                self.object_count,
-                as_enum!(self.destination),
-                self.lock_level,
-                self.key,
-                self.trap,
-                self.soul,
-                self.blocked,
-                self.deleted,
-            ],
-        )
+            links[0],
+            links[1],
+            self.mast_index,
+            self.refr_index,
+            self.temporary,
+            as_sql!(self.translation),
+            as_sql!(self.rotation),
+            self.scale,
+            as_sql!(self.moved_cell),
+            as_option!(owner),
+            as_option!(owner_global),
+            as_option!(owner_faction),
+            self.owner_faction_rank,
+            self.charge_left,
+            self.health_left,
+            self.object_count,
+            as_enum!(self.destination),
+            self.lock_level,
+            self.key,
+            self.trap,
+            self.soul,
+            self.blocked,
+            self.deleted,
+        ];
+
+        s.execute(params)
     }
 }

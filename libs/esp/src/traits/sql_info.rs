@@ -1,3 +1,5 @@
+use rusqlite::CachedStatement;
+
 use crate::prelude::*;
 
 #[macro_export]
@@ -64,8 +66,8 @@ pub struct JoinTableSchema {
 pub trait SqlInfoMeta {
     fn table_name(&self) -> &'static str;
     fn table_schema(&self) -> TableSchema;
-
-    fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize>;
+    fn get_insert_schema(&self) -> String;
+    fn get_join_insert_schema(&self) -> String;
 }
 
 pub trait SqlInfo {
@@ -73,8 +75,8 @@ pub trait SqlInfo {
     fn table_constraints(&self) -> Vec<&'static str> {
         vec![]
     }
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize>;
-    fn join_table_insert(&self, _db: &Connection, _mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize>;
+    fn insert_join_sql_record(&self, _mod_name: &str, _s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         Ok(0)
     }
 }
@@ -86,42 +88,7 @@ pub trait SqlJoinInfo {
         vec![]
     }
     fn table_parent_constraints(&self) -> Vec<&'static str>;
-    fn table_insert(&self, db: &Connection, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize>;
-
-    fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize> {
-        let variable_names = self
-            .table_columns()
-            .iter()
-            .map(|(name, _)| name.to_string())
-            .collect::<Vec<_>>()
-            .join(", ");
-        let param_names = self
-            .table_columns()
-            .iter()
-            .enumerate()
-            .map(|(i, _)| format!("?{}", i + 2))
-            .collect::<Vec<_>>()
-            .join(", ");
-
-        let str = format!(
-            "REPLACE INTO {}
-            (
-            mod, {}
-            ) 
-            VALUES
-            (
-            ?1, {}
-            )",
-            self.table_name(),
-            variable_names,
-            param_names,
-        );
-
-        let mut final_params = params![mod_name].to_vec();
-        final_params.extend_from_slice(params);
-
-        db.execute(str.as_str(), final_params.as_slice())
-    }
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str, links: &[&dyn ToSql]) -> rusqlite::Result<usize>;
 
     fn table_schema(&self) -> JoinTableSchema {
         JoinTableSchema {
@@ -152,19 +119,17 @@ impl SqlInfo for TES3Object {
             }
         }
     }
-
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         delegate! {
             match self {
-                inner => inner.table_insert(db, mod_name)
+                inner => inner.insert_sql_record(mod_name, s)
             }
         }
     }
-
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         delegate! {
             match self {
-                inner => inner.join_table_insert(db, mod_name)
+                inner => inner.insert_join_sql_record(mod_name, s)
             }
         }
     }
@@ -187,7 +152,7 @@ impl SqlInfoMeta for TES3Object {
         }
     }
 
-    fn table_insert2(&self, db: &Connection, mod_name: &str, params: &[&dyn ToSql]) -> rusqlite::Result<usize> {
+    fn get_insert_schema(&self) -> String {
         let variable_names = self
             .table_columns()
             .iter()
@@ -202,7 +167,6 @@ impl SqlInfoMeta for TES3Object {
             .collect::<Vec<_>>()
             .join(", ");
 
-        let as_tes3: TES3Object = self.clone().into();
         let str = format!(
             "REPLACE INTO {}
             (
@@ -212,16 +176,43 @@ impl SqlInfoMeta for TES3Object {
             (
             ?1, ?2, ?3, {}
             )",
-            as_tes3.table_name(),
+            self.table_name(),
             variable_names,
             param_names
         );
 
-        let id = self.editor_id();
-        let flags = as_flags!(self.object_flags());
-        let mut final_params = params![id, mod_name, flags].to_vec();
-        final_params.extend_from_slice(params);
+        str
+    }
 
-        db.execute(str.as_str(), final_params.as_slice())
+    fn get_join_insert_schema(&self) -> String {
+        let variable_names = self
+            .table_columns()
+            .iter()
+            .map(|(name, _)| name.to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let param_names = self
+            .table_columns()
+            .iter()
+            .enumerate()
+            .map(|(i, _)| format!("?{}", i + 4))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let str = format!(
+            "REPLACE INTO {}
+            (
+            mod, {}
+            ) 
+            VALUES
+            (
+            ?1, {}
+            )",
+            self.table_name(),
+            variable_names,
+            param_names,
+        );
+
+        str
     }
 }

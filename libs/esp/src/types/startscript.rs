@@ -70,8 +70,8 @@ impl SqlInfo for StartScript {
         vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(db, mod_name, params![as_option!(self.script)])
+        as_tes3.table_insert2(tx, mod_name, params![as_option!(self.script)])
     }
 }

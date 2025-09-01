@@ -312,10 +312,10 @@ impl SqlInfo for Creature {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 self.name,
@@ -358,28 +358,28 @@ impl SqlInfo for Creature {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for (idx, item_id) in &self.inventory {
             let join = InventoryJoin {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(db, mod_name, &[&Null, &self.editor_id(), &Null])?;
+            join.table_insert(tx, mod_name, &[&Null, &self.editor_id(), &Null])?;
         }
 
         for spell_id in &self.spells {
             let join = SpellJoin {
                 spell_id: spell_id.clone(),
             };
-            join.table_insert(db, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
+            join.table_insert(tx, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
         }
 
         for dest in &self.travel_destinations {
-            dest.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
+            dest.table_insert(tx, mod_name, &[&self.editor_id(), &Null])?;
         }
 
         for package in &self.ai_packages {
-            package.table_insert(db, mod_name, &[&self.editor_id(), &Null])?;
+            package.table_insert(tx, mod_name, &[&self.editor_id(), &Null])?;
         }
         Ok(0)
     }

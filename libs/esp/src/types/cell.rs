@@ -296,13 +296,13 @@ impl SqlInfo for Cell {
         vec!["FOREIGN KEY(region) REFERENCES REGN(id)"]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
 
         let region_str = if let Some(region) = &self.region { region } else { "" };
 
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 self.name,
@@ -322,9 +322,9 @@ impl SqlInfo for Cell {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for (grid, reference) in &self.references {
-            reference.table_insert(db, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
+            reference.table_insert(tx, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
         }
         Ok(0)
     }

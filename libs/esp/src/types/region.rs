@@ -176,10 +176,10 @@ impl SqlInfo for Region {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 self.name,
@@ -199,13 +199,13 @@ impl SqlInfo for Region {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for (sound_id, _) in &self.sounds {
             let join = SoundJoin {
                 sound_id: sound_id.to_string(),
             };
             let links: [&dyn ToSql; 1] = [&self.editor_id()];
-            join.table_insert(db, mod_name, &links)?;
+            join.table_insert(tx, mod_name, &links)?;
         }
         Ok(0)
     }

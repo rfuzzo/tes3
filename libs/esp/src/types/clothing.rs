@@ -144,10 +144,10 @@ impl SqlInfo for Clothing {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 self.name,
@@ -164,9 +164,9 @@ impl SqlInfo for Clothing {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for biped_object in &self.biped_objects {
-            biped_object.table_insert(db, mod_name, &[&Null, &self.editor_id()])?;
+            biped_object.table_insert(tx, mod_name, &[&Null, &self.editor_id()])?;
         }
         Ok(1)
     }

@@ -122,21 +122,24 @@ impl SqlInfo for Apparatus {
         vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            db,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.icon,
-                as_enum!(self.data.apparatus_type),
-                self.data.quality,
-                self.data.weight,
-                self.data.value,
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            self.icon,
+            as_enum!(self.data.apparatus_type),
+            self.data.quality,
+            self.data.weight,
+            self.data.value,
+        ];
+
+        s.execute(params)
     }
 }

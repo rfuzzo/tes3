@@ -85,7 +85,7 @@ impl SqlInfo for GameSetting {
         vec![("type", "TEXT"), ("val", "TEXT")]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let type_name = match &self.value {
             GameSettingValue::Float(_) => "Float".to_string(),
             GameSettingValue::Integer(_) => "Integer".to_string(),
@@ -98,6 +98,6 @@ impl SqlInfo for GameSetting {
         };
 
         let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(db, mod_name, params![type_name, value])
+        as_tes3.table_insert2(tx, mod_name, params![type_name, value])
     }
 }

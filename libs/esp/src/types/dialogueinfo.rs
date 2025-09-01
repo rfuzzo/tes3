@@ -380,10 +380,10 @@ impl SqlInfo for DialogueInfo {
         ]
     }
 
-    fn table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         let as_tes3: TES3Object = self.clone().into();
         as_tes3.table_insert2(
-            db,
+            tx,
             mod_name,
             params![
                 as_option!(self.prev_id),
@@ -407,9 +407,9 @@ impl SqlInfo for DialogueInfo {
         )
     }
 
-    fn join_table_insert(&self, db: &Connection, mod_name: &str) -> rusqlite::Result<usize> {
+    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
         for filter in &self.filters {
-            filter.table_insert(db, mod_name, &[&self.editor_id()])?;
+            filter.table_insert(tx, mod_name, &[&self.editor_id()])?;
         }
         Ok(1)
     }

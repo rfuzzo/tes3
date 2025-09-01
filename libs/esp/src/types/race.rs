@@ -156,49 +156,52 @@ impl SqlInfo for Race {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                self.description,
-                as_enum!(self.data.skill_bonuses.skill_0),
-                self.data.skill_bonuses.bonus_0,
-                as_enum!(self.data.skill_bonuses.skill_1),
-                self.data.skill_bonuses.bonus_1,
-                as_enum!(self.data.skill_bonuses.skill_2),
-                self.data.skill_bonuses.bonus_2,
-                as_enum!(self.data.skill_bonuses.skill_3),
-                self.data.skill_bonuses.bonus_3,
-                as_enum!(self.data.skill_bonuses.skill_4),
-                self.data.skill_bonuses.bonus_4,
-                as_enum!(self.data.skill_bonuses.skill_5),
-                self.data.skill_bonuses.bonus_5,
-                as_enum!(self.data.skill_bonuses.skill_6),
-                self.data.skill_bonuses.bonus_6,
-                as_sql!(self.data.strength),
-                as_sql!(self.data.intelligence),
-                as_sql!(self.data.willpower),
-                as_sql!(self.data.agility),
-                as_sql!(self.data.speed),
-                as_sql!(self.data.endurance),
-                as_sql!(self.data.personality),
-                as_sql!(self.data.luck),
-                as_sql!(self.data.height),
-                as_sql!(self.data.weight),
-                as_flags!(self.data.flags),
-            ],
-        )
+            flags,
+            self.name,
+            self.description,
+            as_enum!(self.data.skill_bonuses.skill_0),
+            self.data.skill_bonuses.bonus_0,
+            as_enum!(self.data.skill_bonuses.skill_1),
+            self.data.skill_bonuses.bonus_1,
+            as_enum!(self.data.skill_bonuses.skill_2),
+            self.data.skill_bonuses.bonus_2,
+            as_enum!(self.data.skill_bonuses.skill_3),
+            self.data.skill_bonuses.bonus_3,
+            as_enum!(self.data.skill_bonuses.skill_4),
+            self.data.skill_bonuses.bonus_4,
+            as_enum!(self.data.skill_bonuses.skill_5),
+            self.data.skill_bonuses.bonus_5,
+            as_enum!(self.data.skill_bonuses.skill_6),
+            self.data.skill_bonuses.bonus_6,
+            as_sql!(self.data.strength),
+            as_sql!(self.data.intelligence),
+            as_sql!(self.data.willpower),
+            as_sql!(self.data.agility),
+            as_sql!(self.data.speed),
+            as_sql!(self.data.endurance),
+            as_sql!(self.data.personality),
+            as_sql!(self.data.luck),
+            as_sql!(self.data.height),
+            as_sql!(self.data.weight),
+            as_flags!(self.data.flags),
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for spell_id in &self.spells {
             let join = SpellJoin {
                 spell_id: spell_id.clone(),
             };
-            join.table_insert(tx, mod_name, &[&self.editor_id(), &Null, &Null, &Null])?;
+            join.table_insert(s, mod_name, &[&self.editor_id(), &Null, &Null, &Null])?;
         }
         Ok(1)
     }

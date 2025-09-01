@@ -120,30 +120,33 @@ impl SqlInfo for Class {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                self.description,
-                as_enum!(self.data.attribute1),
-                as_enum!(self.data.attribute2),
-                as_enum!(self.data.specialization),
-                as_enum!(self.data.minor1),
-                as_enum!(self.data.major1),
-                as_enum!(self.data.minor2),
-                as_enum!(self.data.major2),
-                as_enum!(self.data.minor3),
-                as_enum!(self.data.major3),
-                as_enum!(self.data.minor4),
-                as_enum!(self.data.major4),
-                as_enum!(self.data.minor5),
-                as_enum!(self.data.major5),
-                as_flags!(self.data.flags),
-                as_flags!(self.data.services),
-            ],
-        )
+            flags,
+            self.name,
+            self.description,
+            as_enum!(self.data.attribute1),
+            as_enum!(self.data.attribute2),
+            as_enum!(self.data.specialization),
+            as_enum!(self.data.minor1),
+            as_enum!(self.data.major1),
+            as_enum!(self.data.minor2),
+            as_enum!(self.data.major2),
+            as_enum!(self.data.minor3),
+            as_enum!(self.data.major3),
+            as_enum!(self.data.minor4),
+            as_enum!(self.data.major4),
+            as_enum!(self.data.minor5),
+            as_enum!(self.data.major5),
+            as_flags!(self.data.flags),
+            as_flags!(self.data.services),
+        ];
+
+        s.execute(params)
     }
 }

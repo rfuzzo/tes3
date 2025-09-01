@@ -192,35 +192,38 @@ impl SqlInfo for Faction {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_sql!(self.rank_names),
-                as_enum!(self.data.favored_attributes[0]),
-                as_enum!(self.data.favored_attributes[1]),
-                as_enum!(self.data.favored_skills[0]),
-                as_enum!(self.data.favored_skills[1]),
-                as_enum!(self.data.favored_skills[2]),
-                as_enum!(self.data.favored_skills[3]),
-                as_enum!(self.data.favored_skills[4]),
-                as_enum!(self.data.favored_skills[5]),
-                as_enum!(self.data.favored_skills[6]),
-                as_flags!(self.data.flags)
-            ],
-        )
+            flags,
+            self.name,
+            as_sql!(self.rank_names),
+            as_enum!(self.data.favored_attributes[0]),
+            as_enum!(self.data.favored_attributes[1]),
+            as_enum!(self.data.favored_skills[0]),
+            as_enum!(self.data.favored_skills[1]),
+            as_enum!(self.data.favored_skills[2]),
+            as_enum!(self.data.favored_skills[3]),
+            as_enum!(self.data.favored_skills[4]),
+            as_enum!(self.data.favored_skills[5]),
+            as_enum!(self.data.favored_skills[6]),
+            as_flags!(self.data.flags)
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for reaction in &self.reactions {
-            reaction.table_insert(tx, mod_name, &[&self.editor_id()])?;
+            reaction.table_insert(s, mod_name, &[&self.editor_id()])?;
         }
 
         for requirement in &self.data.requirements {
-            requirement.table_insert(tx, mod_name, &[&self.editor_id()])?;
+            requirement.table_insert(s, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

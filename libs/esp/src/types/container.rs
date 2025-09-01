@@ -122,28 +122,31 @@ impl SqlInfo for Container {
         vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.encumbrance,
-                as_flags!(self.container_flags),
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            self.encumbrance,
+            as_flags!(self.container_flags),
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for (idx, item_id) in &self.inventory {
             let join = InventoryJoin {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(tx, mod_name, &[&self.editor_id(), &Null, &Null])?;
+            join.table_insert(s, mod_name, &[&self.editor_id(), &Null, &Null])?;
         }
         Ok(0)
     }

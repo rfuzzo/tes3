@@ -296,35 +296,37 @@ impl SqlInfo for Cell {
         vec!["FOREIGN KEY(region) REFERENCES REGN(id)"]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
 
         let region_str = if let Some(region) = &self.region { region } else { "" };
 
-        as_tes3.table_insert2(
-            tx,
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                //
-                as_flags!(self.data.flags),
-                as_sql!(self.data.grid),
-                //
-                as_option!(region_str),
-                as_color!(self.map_color),
-                self.water_height,
-                //
-                as_color!(self.atmosphere_data.as_ref().map(|x| x.ambient_color)),
-                as_color!(self.atmosphere_data.as_ref().map(|x| x.sunlight_color)),
-                as_color!(self.atmosphere_data.as_ref().map(|x| x.fog_color)),
-                self.atmosphere_data.as_ref().map(|x| x.fog_density),
-            ],
-        )
+            flags,
+            self.name,
+            //
+            as_flags!(self.data.flags),
+            as_sql!(self.data.grid),
+            //
+            as_option!(region_str),
+            as_color!(self.map_color),
+            self.water_height,
+            //
+            as_color!(self.atmosphere_data.as_ref().map(|x| x.ambient_color)),
+            as_color!(self.atmosphere_data.as_ref().map(|x| x.sunlight_color)),
+            as_color!(self.atmosphere_data.as_ref().map(|x| x.fog_color)),
+            self.atmosphere_data.as_ref().map(|x| x.fog_density),
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for (grid, reference) in &self.references {
-            reference.table_insert(tx, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
+            reference.table_insert(s, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
         }
         Ok(0)
     }

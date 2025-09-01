@@ -89,23 +89,26 @@ impl SqlInfo for Enchanting {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                as_enum!(self.data.enchant_type),
-                self.data.cost,
-                self.data.max_charge,
-                as_flags!(self.data.flags),
-            ],
-        )
+            flags,
+            as_enum!(self.data.enchant_type),
+            self.data.cost,
+            self.data.max_charge,
+            as_flags!(self.data.flags),
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for effect in &self.effects {
-            effect.table_insert(tx, mod_name, &[&Null, &self.editor_id(), &Null])?;
+            effect.table_insert(s, mod_name, &[&Null, &self.editor_id(), &Null])?;
         }
         Ok(0)
     }

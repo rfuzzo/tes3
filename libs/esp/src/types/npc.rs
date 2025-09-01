@@ -406,68 +406,71 @@ impl SqlInfo for Npc {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                //
-                self.ai_data.hello,
-                self.ai_data.fight,
-                self.ai_data.flee,
-                self.ai_data.alarm,
-                as_flags!(self.ai_data.services),
-                //
-                as_option!(self.race),
-                as_option!(self.class),
-                as_option!(self.faction),
-                as_option!(self.head),
-                as_option!(self.hair),
-                as_flags!(self.npc_flags),
-                self.blood_type,
-                //
-                self.data.level,
-                //
-                self.data.stats.as_ref().map(|x| as_json!(x.attributes)),
-                self.data.stats.as_ref().map(|x| as_json!(x.skills)),
-                self.data.stats.as_ref().map(|x| x.health),
-                self.data.stats.as_ref().map(|x| x.magicka),
-                self.data.stats.as_ref().map(|x| x.fatigue),
-                //
-                self.data.disposition,
-                self.data.reputation,
-                self.data.rank,
-                self.data.gold
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            //
+            self.ai_data.hello,
+            self.ai_data.fight,
+            self.ai_data.flee,
+            self.ai_data.alarm,
+            as_flags!(self.ai_data.services),
+            //
+            as_option!(self.race),
+            as_option!(self.class),
+            as_option!(self.faction),
+            as_option!(self.head),
+            as_option!(self.hair),
+            as_flags!(self.npc_flags),
+            self.blood_type,
+            //
+            self.data.level,
+            //
+            self.data.stats.as_ref().map(|x| as_json!(x.attributes)),
+            self.data.stats.as_ref().map(|x| as_json!(x.skills)),
+            self.data.stats.as_ref().map(|x| x.health),
+            self.data.stats.as_ref().map(|x| x.magicka),
+            self.data.stats.as_ref().map(|x| x.fatigue),
+            //
+            self.data.disposition,
+            self.data.reputation,
+            self.data.rank,
+            self.data.gold
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for (idx, item_id) in &self.inventory {
             let join = InventoryJoin {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(tx, mod_name, &[&Null, &Null, &self.editor_id()])?;
+            join.table_insert(s, mod_name, &[&Null, &Null, &self.editor_id()])?;
         }
 
         for spell_id in &self.spells {
             let join = SpellJoin {
                 spell_id: spell_id.clone(),
             };
-            join.table_insert(tx, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
+            join.table_insert(s, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
         }
 
         for dest in &self.travel_destinations {
-            dest.table_insert(tx, mod_name, &[&Null, &self.editor_id()])?;
+            dest.table_insert(s, mod_name, &[&Null, &self.editor_id()])?;
         }
 
         for package in &self.ai_packages {
-            package.table_insert(tx, mod_name, &[&Null, &self.editor_id()])?;
+            package.table_insert(s, mod_name, &[&Null, &self.editor_id()])?;
         }
         Ok(0)
     }

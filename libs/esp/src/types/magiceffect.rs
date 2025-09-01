@@ -206,32 +206,35 @@ impl SqlInfo for MagicEffect {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                //as_enum!(self.effect_id),
-                self.icon,
-                self.texture,
-                as_option!(self.bolt_sound),
-                as_option!(self.cast_sound),
-                as_option!(self.hit_sound),
-                as_option!(self.area_sound),
-                self.cast_visual,
-                self.bolt_visual,
-                self.hit_visual,
-                self.area_visual,
-                self.description,
-                as_enum!(self.data.school),
-                self.data.base_cost,
-                as_flags!(self.data.flags),
-                as_color!(self.data.color),
-                self.data.speed,
-                self.data.size,
-                self.data.size_cap,
-            ],
-        )
+            flags,
+            //as_enum!(self.effect_id),
+            self.icon,
+            self.texture,
+            as_option!(self.bolt_sound),
+            as_option!(self.cast_sound),
+            as_option!(self.hit_sound),
+            as_option!(self.area_sound),
+            self.cast_visual,
+            self.bolt_visual,
+            self.hit_visual,
+            self.area_visual,
+            self.description,
+            as_enum!(self.data.school),
+            self.data.base_cost,
+            as_flags!(self.data.flags),
+            as_color!(self.data.color),
+            self.data.speed,
+            self.data.size,
+            self.data.size_cap,
+        ];
+
+        s.execute(params)
     }
 }

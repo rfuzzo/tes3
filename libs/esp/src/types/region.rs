@@ -176,36 +176,39 @@ impl SqlInfo for Region {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                self.weather_chances.clear,
-                self.weather_chances.cloudy,
-                self.weather_chances.foggy,
-                self.weather_chances.overcast,
-                self.weather_chances.rain,
-                self.weather_chances.thunder,
-                self.weather_chances.ash,
-                self.weather_chances.blight,
-                self.weather_chances.snow,
-                self.weather_chances.blizzard,
-                self.sleep_creature,
-                as_color!(self.map_color),
-            ],
-        )
+            flags,
+            self.name,
+            self.weather_chances.clear,
+            self.weather_chances.cloudy,
+            self.weather_chances.foggy,
+            self.weather_chances.overcast,
+            self.weather_chances.rain,
+            self.weather_chances.thunder,
+            self.weather_chances.ash,
+            self.weather_chances.blight,
+            self.weather_chances.snow,
+            self.weather_chances.blizzard,
+            self.sleep_creature,
+            as_color!(self.map_color),
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for (sound_id, _) in &self.sounds {
             let join = SoundJoin {
                 sound_id: sound_id.to_string(),
             };
             let links: [&dyn ToSql; 1] = [&self.editor_id()];
-            join.table_insert(tx, mod_name, &links)?;
+            join.table_insert(s, mod_name, &links)?;
         }
         Ok(0)
     }

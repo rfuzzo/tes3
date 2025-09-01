@@ -312,74 +312,77 @@ impl SqlInfo for Creature {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.ai_data.hello,
-                self.ai_data.fight,
-                self.ai_data.flee,
-                self.ai_data.alarm,
-                as_flags!(self.ai_data.services),
-                as_option!(self.sound),
-                self.scale,
-                as_flags!(self.creature_flags),
-                self.blood_type,
-                as_enum!(self.data.creature_type),
-                self.data.level,
-                self.data.strength,
-                self.data.intelligence,
-                self.data.willpower,
-                self.data.agility,
-                self.data.speed,
-                self.data.endurance,
-                self.data.personality,
-                self.data.luck,
-                self.data.health,
-                self.data.magicka,
-                self.data.fatigue,
-                self.data.soul,
-                self.data.combat,
-                self.data.magic,
-                self.data.stealth,
-                self.data.attack1.0,
-                self.data.attack1.1,
-                self.data.attack2.0,
-                self.data.attack2.1,
-                self.data.attack3.0,
-                self.data.attack3.1,
-                self.data.gold,
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            self.ai_data.hello,
+            self.ai_data.fight,
+            self.ai_data.flee,
+            self.ai_data.alarm,
+            as_flags!(self.ai_data.services),
+            as_option!(self.sound),
+            self.scale,
+            as_flags!(self.creature_flags),
+            self.blood_type,
+            as_enum!(self.data.creature_type),
+            self.data.level,
+            self.data.strength,
+            self.data.intelligence,
+            self.data.willpower,
+            self.data.agility,
+            self.data.speed,
+            self.data.endurance,
+            self.data.personality,
+            self.data.luck,
+            self.data.health,
+            self.data.magicka,
+            self.data.fatigue,
+            self.data.soul,
+            self.data.combat,
+            self.data.magic,
+            self.data.stealth,
+            self.data.attack1.0,
+            self.data.attack1.1,
+            self.data.attack2.0,
+            self.data.attack2.1,
+            self.data.attack3.0,
+            self.data.attack3.1,
+            self.data.gold,
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for (idx, item_id) in &self.inventory {
             let join = InventoryJoin {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(tx, mod_name, &[&Null, &self.editor_id(), &Null])?;
+            join.table_insert(s, mod_name, &[&Null, &self.editor_id(), &Null])?;
         }
 
         for spell_id in &self.spells {
             let join = SpellJoin {
                 spell_id: spell_id.clone(),
             };
-            join.table_insert(tx, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
+            join.table_insert(s, mod_name, &[&Null, &Null, &self.editor_id(), &Null])?;
         }
 
         for dest in &self.travel_destinations {
-            dest.table_insert(tx, mod_name, &[&self.editor_id(), &Null])?;
+            dest.table_insert(s, mod_name, &[&self.editor_id(), &Null])?;
         }
 
         for package in &self.ai_packages {
-            package.table_insert(tx, mod_name, &[&self.editor_id(), &Null])?;
+            package.table_insert(s, mod_name, &[&self.editor_id(), &Null])?;
         }
         Ok(0)
     }

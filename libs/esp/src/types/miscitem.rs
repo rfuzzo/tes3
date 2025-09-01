@@ -121,20 +121,23 @@ impl SqlInfo for MiscItem {
         vec!["FOREIGN KEY(script) REFERENCES SCPT(id)"]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.icon,
-                self.data.weight,
-                self.data.value,
-                as_flags!(self.data.flags)
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            self.icon,
+            self.data.weight,
+            self.data.value,
+            as_flags!(self.data.flags)
+        ];
+
+        s.execute(params)
     }
 }

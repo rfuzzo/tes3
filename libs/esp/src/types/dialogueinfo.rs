@@ -380,36 +380,39 @@ impl SqlInfo for DialogueInfo {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                as_option!(self.prev_id),
-                as_option!(self.next_id),
-                as_enum!(self.data.dialogue_type),
-                self.data.disposition,
-                self.data.speaker_rank,
-                as_enum!(self.data.speaker_sex),
-                self.data.player_rank,
-                as_option!(self.speaker_id),
-                as_option!(self.speaker_race),
-                as_option!(self.speaker_class),
-                as_option!(self.speaker_faction),
-                as_option!(self.speaker_cell),
-                as_option!(self.player_faction),
-                self.sound_path,
-                self.text,
-                as_enum!(self.quest_state),
-                self.script_text,
-            ],
-        )
+            flags,
+            as_option!(self.prev_id),
+            as_option!(self.next_id),
+            as_enum!(self.data.dialogue_type),
+            self.data.disposition,
+            self.data.speaker_rank,
+            as_enum!(self.data.speaker_sex),
+            self.data.player_rank,
+            as_option!(self.speaker_id),
+            as_option!(self.speaker_race),
+            as_option!(self.speaker_class),
+            as_option!(self.speaker_faction),
+            as_option!(self.speaker_cell),
+            as_option!(self.player_faction),
+            self.sound_path,
+            self.text,
+            as_enum!(self.quest_state),
+            self.script_text,
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for filter in &self.filters {
-            filter.table_insert(tx, mod_name, &[&self.editor_id()])?;
+            filter.table_insert(s, mod_name, &[&self.editor_id()])?;
         }
         Ok(1)
     }

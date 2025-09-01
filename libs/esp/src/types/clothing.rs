@@ -144,29 +144,32 @@ impl SqlInfo for Clothing {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.icon,
-                as_option!(self.enchanting),
-                //
-                as_enum!(self.data.clothing_type),
-                self.data.weight,
-                self.data.value,
-                self.data.enchantment,
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            self.icon,
+            as_option!(self.enchanting),
+            //
+            as_enum!(self.data.clothing_type),
+            self.data.weight,
+            self.data.value,
+            self.data.enchantment,
+        ];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for biped_object in &self.biped_objects {
-            biped_object.table_insert(tx, mod_name, &[&Null, &self.editor_id()])?;
+            biped_object.table_insert(s, mod_name, &[&Null, &self.editor_id()])?;
         }
         Ok(1)
     }

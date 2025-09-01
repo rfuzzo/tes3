@@ -112,22 +112,22 @@ impl SqlInfo for LeveledCreature {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
-            mod_name,
-            params![as_flags!(self.leveled_creature_flags), self.chance_none,],
-        )
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![id, mod_name, flags, as_flags!(self.leveled_creature_flags), self.chance_none];
+
+        s.execute(params)
     }
 
-    fn join_table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
         for (creature_id, probability) in &self.creatures {
             let join = CreatureJoin {
                 creature_id: creature_id.to_string(),
                 probability: probability.to_owned(),
             };
-            join.table_insert(tx, mod_name, &[&self.editor_id()])?;
+            join.table_insert(s, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

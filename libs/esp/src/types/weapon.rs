@@ -156,32 +156,35 @@ impl SqlInfo for Weapon {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                self.name,
-                as_option!(self.script),
-                self.mesh,
-                self.icon,
-                as_option!(self.enchanting),
-                self.data.weight,
-                self.data.value,
-                as_enum!(self.data.weapon_type),
-                self.data.health,
-                self.data.speed,
-                self.data.reach,
-                self.data.enchantment,
-                self.data.chop_min,
-                self.data.chop_max,
-                self.data.slash_min,
-                self.data.slash_max,
-                self.data.thrust_min,
-                self.data.thrust_max,
-                as_flags!(self.data.flags)
-            ],
-        )
+            flags,
+            self.name,
+            as_option!(self.script),
+            self.mesh,
+            self.icon,
+            as_option!(self.enchanting),
+            self.data.weight,
+            self.data.value,
+            as_enum!(self.data.weapon_type),
+            self.data.health,
+            self.data.speed,
+            self.data.reach,
+            self.data.enchantment,
+            self.data.chop_min,
+            self.data.chop_max,
+            self.data.slash_min,
+            self.data.slash_max,
+            self.data.thrust_min,
+            self.data.thrust_max,
+            as_flags!(self.data.flags)
+        ];
+
+        s.execute(params)
     }
 }

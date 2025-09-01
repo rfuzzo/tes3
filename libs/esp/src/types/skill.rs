@@ -92,21 +92,24 @@ impl SqlInfo for Skill {
         ]
     }
 
-    fn table_insert(&self, s: &mut CachedStatement<'_>, mod_name: &str) -> rusqlite::Result<usize> {
-        let as_tes3: TES3Object = self.clone().into();
-        as_tes3.table_insert2(
-            tx,
+    fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+        let id = self.editor_id();
+        let flags = as_flags!(self.object_flags());
+
+        let params = params![
+            id,
             mod_name,
-            params![
-                as_enum!(self.skill_id),
-                self.data.governing_attribute,
-                self.data.specialization,
-                self.data.actions[0],
-                self.data.actions[1],
-                self.data.actions[2],
-                self.data.actions[3],
-                self.description,
-            ],
-        )
+            flags,
+            as_enum!(self.skill_id),
+            self.data.governing_attribute,
+            self.data.specialization,
+            self.data.actions[0],
+            self.data.actions[1],
+            self.data.actions[2],
+            self.data.actions[3],
+            self.description,
+        ];
+
+        s.execute(params)
     }
 }

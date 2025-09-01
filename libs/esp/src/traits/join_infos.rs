@@ -479,8 +479,9 @@ impl SqlJoinInfo for Reference {
             ("cell_id", "TEXT"), //FK
             ("grid", "TEXT"),
             // this
-            ("mast_index", "INREGER"),
+            ("mast_index", "INTEGER"),
             ("refr_index", "INTEGER"),
+            ("id", "TEXT"),
             ("temporary", "INTEGER"), //bool
             ("translation", "TEXT"),  //format
             ("rotation", "TEXT"),     //format
@@ -522,6 +523,7 @@ impl SqlJoinInfo for Reference {
             links[1],
             self.mast_index,
             self.refr_index,
+            self.id,
             self.temporary,
             as_sql!(self.translation),
             as_sql!(self.rotation),

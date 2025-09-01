@@ -140,13 +140,17 @@ impl SqlInfo for Container {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // prepare cached schema
+        let schema = InventoryJoin::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for (idx, item_id) in &self.inventory {
             let join = InventoryJoin {
                 index: *idx,
                 item_id: item_id.to_string(),
             };
-            join.table_insert(s, mod_name, &[&self.editor_id(), &Null, &Null])?;
+            join.table_insert(&mut s, mod_name, &[&self.editor_id(), &Null, &Null])?;
         }
         Ok(0)
     }

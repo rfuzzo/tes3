@@ -106,9 +106,13 @@ impl SqlInfo for Enchanting {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // prepare cached schema
+        let schema = Effect::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for effect in &self.effects {
-            effect.table_insert(s, mod_name, &[&Null, &self.editor_id(), &Null])?;
+            effect.table_insert(&mut s, mod_name, &[&Null, &self.editor_id(), &Null])?;
         }
         Ok(0)
     }

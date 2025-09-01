@@ -121,13 +121,17 @@ impl SqlInfo for LeveledCreature {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // prepare cached schema
+        let schema = CreatureJoin::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for (creature_id, probability) in &self.creatures {
             let join = CreatureJoin {
                 creature_id: creature_id.to_string(),
                 probability: probability.to_owned(),
             };
-            join.table_insert(s, mod_name, &[&self.editor_id()])?;
+            join.table_insert(&mut s, mod_name, &[&self.editor_id()])?;
         }
         Ok(0)
     }

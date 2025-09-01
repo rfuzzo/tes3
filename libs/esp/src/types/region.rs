@@ -202,13 +202,17 @@ impl SqlInfo for Region {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // Prepare cached schema
+        let schema = SoundJoin::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for (sound_id, _) in &self.sounds {
             let join = SoundJoin {
                 sound_id: sound_id.to_string(),
             };
             let links: [&dyn ToSql; 1] = [&self.editor_id()];
-            join.table_insert(s, mod_name, &links)?;
+            join.table_insert(&mut s, mod_name, &links)?;
         }
         Ok(0)
     }

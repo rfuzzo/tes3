@@ -410,10 +410,14 @@ impl SqlInfo for DialogueInfo {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // prepare cached schema
+        let schema = Filter::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for filter in &self.filters {
-            filter.table_insert(s, mod_name, &[&self.editor_id()])?;
+            filter.table_insert(&mut s, mod_name, &[&self.editor_id()])?;
         }
-        Ok(1)
+        Ok(0)
     }
 }

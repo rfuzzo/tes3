@@ -449,29 +449,54 @@ impl SqlInfo for Npc {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
-        for (idx, item_id) in &self.inventory {
-            let join = InventoryJoin {
-                index: *idx,
-                item_id: item_id.to_string(),
-            };
-            join.table_insert(s, mod_name, &[&Null, &Null, &self.editor_id()])?;
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        {
+            // Prepare cached schema
+            let schema = InventoryJoin::default().get_join_insert_schema();
+            let mut s = tx.prepare_cached(&schema).unwrap();
+
+            for (idx, item_id) in &self.inventory {
+                let join = InventoryJoin {
+                    index: *idx,
+                    item_id: item_id.to_string(),
+                };
+                join.table_insert(&mut s, mod_name, &[&Null, &Null, &self.editor_id()])?;
+            }
         }
 
-        for spell_id in &self.spells {
-            let join = SpellJoin {
-                spell_id: spell_id.clone(),
-            };
-            join.table_insert(s, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
+        {
+            // Prepare cached schema
+            let schema = SpellJoin::default().get_join_insert_schema();
+            let mut s = tx.prepare_cached(&schema).unwrap();
+
+            for spell_id in &self.spells {
+                let join = SpellJoin {
+                    spell_id: spell_id.clone(),
+                };
+                join.table_insert(&mut s, mod_name, &[&Null, &Null, &Null, &self.editor_id()])?;
+            }
         }
 
-        for dest in &self.travel_destinations {
-            dest.table_insert(s, mod_name, &[&Null, &self.editor_id()])?;
+        {
+            // Prepare cached schema
+            let schema = TravelDestination::default().get_join_insert_schema();
+            let mut s = tx.prepare_cached(&schema).unwrap();
+
+            for dest in &self.travel_destinations {
+                dest.table_insert(&mut s, mod_name, &[&Null, &self.editor_id()])?;
+            }
         }
 
-        for package in &self.ai_packages {
-            package.table_insert(s, mod_name, &[&Null, &self.editor_id()])?;
+        {
+            // Prepare cached schema
+            let schema = AiPackage::default().get_join_insert_schema();
+            let mut s = tx.prepare_cached(&schema).unwrap();
+
+            for package in &self.ai_packages {
+                package.table_insert(&mut s, mod_name, &[&Null, &self.editor_id()])?;
+            }
         }
+
         Ok(0)
     }
 }

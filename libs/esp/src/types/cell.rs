@@ -324,9 +324,13 @@ impl SqlInfo for Cell {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // prepare cached schema
+        let schema = Reference::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for (grid, reference) in &self.references {
-            reference.table_insert(s, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
+            reference.table_insert(&mut s, mod_name, &[&self.editor_id(), &as_sql!(grid)])?;
         }
         Ok(0)
     }

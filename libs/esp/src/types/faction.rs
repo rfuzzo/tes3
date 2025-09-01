@@ -217,14 +217,27 @@ impl SqlInfo for Faction {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
-        for reaction in &self.reactions {
-            reaction.table_insert(s, mod_name, &[&self.editor_id()])?;
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        {
+            // prepare cached schema
+            let schema = FactionReaction::default().get_join_insert_schema();
+            let mut s = tx.prepare_cached(&schema).unwrap();
+
+            for reaction in &self.reactions {
+                reaction.table_insert(&mut s, mod_name, &[&self.editor_id()])?;
+            }
         }
 
-        for requirement in &self.data.requirements {
-            requirement.table_insert(s, mod_name, &[&self.editor_id()])?;
+        {
+            // prepare cached schema
+            let schema = FactionRequirement::default().get_join_insert_schema();
+            let mut s = tx.prepare_cached(&schema).unwrap();
+
+            for requirement in &self.data.requirements {
+                requirement.table_insert(&mut s, mod_name, &[&self.editor_id()])?;
+            }
         }
+
         Ok(0)
     }
 }

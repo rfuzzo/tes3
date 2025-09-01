@@ -196,13 +196,17 @@ impl SqlInfo for Race {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // Prepare cached schema
+        let schema = SpellJoin::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for spell_id in &self.spells {
             let join = SpellJoin {
                 spell_id: spell_id.clone(),
             };
-            join.table_insert(s, mod_name, &[&self.editor_id(), &Null, &Null, &Null])?;
+            join.table_insert(&mut s, mod_name, &[&self.editor_id(), &Null, &Null, &Null])?;
         }
-        Ok(1)
+        Ok(0)
     }
 }

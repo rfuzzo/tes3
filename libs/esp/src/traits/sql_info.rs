@@ -67,7 +67,6 @@ pub trait SqlInfoMeta {
     fn table_name(&self) -> &'static str;
     fn table_schema(&self) -> TableSchema;
     fn get_insert_schema(&self) -> String;
-    fn get_join_insert_schema(&self) -> String;
 }
 
 pub trait SqlInfo {
@@ -76,7 +75,7 @@ pub trait SqlInfo {
         vec![]
     }
     fn insert_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize>;
-    fn insert_join_sql_record(&self, _mod_name: &str, _s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, _mod_name: &str, _tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
         Ok(0)
     }
 }
@@ -102,6 +101,38 @@ pub trait SqlJoinInfo {
             parent_constraints: self.table_parent_constraints(),
         }
     }
+
+    fn get_join_insert_schema(&self) -> String {
+        let variable_names = self
+            .table_columns()
+            .iter()
+            .map(|(name, _)| name.to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let param_names = self
+            .table_columns()
+            .iter()
+            .enumerate()
+            .map(|(i, _)| format!("?{}", i + 2))
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        let str = format!(
+            "REPLACE INTO {}
+            (
+            mod, {}
+            ) 
+            VALUES
+            (
+            ?1, {}
+            )",
+            self.table_name(),
+            variable_names,
+            param_names,
+        );
+
+        str
+    }
 }
 
 impl SqlInfo for TES3Object {
@@ -126,10 +157,10 @@ impl SqlInfo for TES3Object {
             }
         }
     }
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
         delegate! {
             match self {
-                inner => inner.insert_join_sql_record(mod_name, s)
+                inner => inner.insert_join_sql_record(mod_name, tx)
             }
         }
     }
@@ -179,38 +210,6 @@ impl SqlInfoMeta for TES3Object {
             self.table_name(),
             variable_names,
             param_names
-        );
-
-        str
-    }
-
-    fn get_join_insert_schema(&self) -> String {
-        let variable_names = self
-            .table_columns()
-            .iter()
-            .map(|(name, _)| name.to_string())
-            .collect::<Vec<_>>()
-            .join(", ");
-        let param_names = self
-            .table_columns()
-            .iter()
-            .enumerate()
-            .map(|(i, _)| format!("?{}", i + 4))
-            .collect::<Vec<_>>()
-            .join(", ");
-
-        let str = format!(
-            "REPLACE INTO {}
-            (
-            mod, {}
-            ) 
-            VALUES
-            (
-            ?1, {}
-            )",
-            self.table_name(),
-            variable_names,
-            param_names,
         );
 
         str

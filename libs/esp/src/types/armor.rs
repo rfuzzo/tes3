@@ -171,10 +171,14 @@ impl SqlInfo for Armor {
         s.execute(params)
     }
 
-    fn insert_join_sql_record(&self, mod_name: &str, s: &mut CachedStatement<'_>) -> rusqlite::Result<usize> {
+    fn insert_join_sql_record(&self, mod_name: &str, tx: &mut Transaction<'_>) -> rusqlite::Result<usize> {
+        // prepare cached schema
+        let schema = BipedObject::default().get_join_insert_schema();
+        let mut s = tx.prepare_cached(&schema).unwrap();
+
         for biped_object in &self.biped_objects {
-            biped_object.table_insert(s, mod_name, &[&self.editor_id(), &Null])?;
+            biped_object.table_insert(&mut s, mod_name, &[&self.editor_id(), &Null])?;
         }
-        Ok(1)
+        Ok(0)
     }
 }
